@@ -40,18 +40,17 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
 
   const handleReady = (event: any) => {
     try {
-      // Ensure video is muted initially to allow autoplay
-      event.target.mute();
-      // Start playing
-      event.target.playVideo();
-      // After playback starts, unmute and adjust volume
-      setTimeout(() => {
-        event.target.unMute();
-        setPlayer(event.target);
-        onPlayerReady(event.target);
-        setLoading(false);
-        setIsPlaying(true);
-      }, 100);
+      // Store player reference first
+      const ytPlayer = event.target;
+      setPlayer(ytPlayer);
+
+      // Initial setup
+      ytPlayer.setVolume(100);
+      ytPlayer.playVideo();
+
+      onPlayerReady(ytPlayer);
+      setLoading(false);
+      setIsPlaying(true);
     } catch (error) {
       console.error('YouTube player initialization error:', error);
       handleError();
