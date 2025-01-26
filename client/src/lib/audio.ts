@@ -17,6 +17,13 @@ class AudioManager {
     }
   }
 
+  setYoutubeVolume(volume: number) {
+    if (this.youtubePlayer && !this.muted) {
+      // YouTube volume is 0-100
+      this.youtubePlayer.setVolume(volume * 100);
+    }
+  }
+
   toggleMute() {
     this.muted = !this.muted;
     if (this.youtubePlayer) {

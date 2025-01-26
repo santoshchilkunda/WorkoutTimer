@@ -37,13 +37,19 @@ export default function Home() {
   } = useWorkoutTimer();
 
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(0.3);
+  const [notificationVolume, setNotificationVolume] = useState(0.3);
+  const [youtubeVolume, setYoutubeVolume] = useState(0.3);
   const [mode, setMode] = useState<"setup" | "workout">("setup");
   const youtubePlayerRef = useRef<YouTubePlayerRef>(null);
 
-  const handleVolumeChange = (newVolume: number) => {
-    setVolume(newVolume);
+  const handleNotificationVolumeChange = (newVolume: number) => {
+    setNotificationVolume(newVolume);
     audioManager.setVolume(newVolume);
+  };
+
+  const handleYoutubeVolumeChange = (newVolume: number) => {
+    setYoutubeVolume(newVolume);
+    audioManager.setYoutubeVolume(newVolume);
   };
 
   const toggleMute = () => {
@@ -53,6 +59,7 @@ export default function Home() {
 
   const handleYoutubePlayerReady = (player: any) => {
     audioManager.setYoutubePlayer(player);
+    audioManager.setYoutubeVolume(youtubeVolume);
   };
 
   const handleStart = async () => {
@@ -273,28 +280,55 @@ export default function Home() {
                       onPlayerReady={handleYoutubePlayerReady}
                     />
 
-                    <div className="flex items-center justify-between">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={toggleMute}
-                        className="h-8 w-8"
-                      >
-                        {isMuted ? (
-                          <VolumeX className="h-4 w-4" />
-                        ) : (
-                          <Volume2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Slider
-                        className="w-32 ml-2"
-                        value={[volume]}
-                        onValueChange={([v]) => handleVolumeChange(v)}
-                        min={0}
-                        max={1}
-                        step={0.1}
-                        disabled={isMuted}
-                      />
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleMute}
+                          className="h-8 w-8"
+                        >
+                          {isMuted ? (
+                            <VolumeX className="h-4 w-4" />
+                          ) : (
+                            <Volume2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Notification Volume</span>
+                            <span className="text-muted-foreground">{Math.round(notificationVolume * 100)}%</span>
+                          </div>
+                          <Slider
+                            value={[notificationVolume]}
+                            onValueChange={([v]) => handleNotificationVolumeChange(v)}
+                            min={0}
+                            max={1}
+                            step={0.1}
+                            disabled={isMuted}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 flex items-center justify-center">
+                          <i className="text-muted-foreground">♫</i>
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">YouTube Volume</span>
+                            <span className="text-muted-foreground">{Math.round(youtubeVolume * 100)}%</span>
+                          </div>
+                          <Slider
+                            value={[youtubeVolume]}
+                            onValueChange={([v]) => handleYoutubeVolumeChange(v)}
+                            min={0}
+                            max={1}
+                            step={0.1}
+                            disabled={isMuted}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </WorkoutDetails>
