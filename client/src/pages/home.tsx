@@ -1,0 +1,103 @@
+import { Card } from "@/components/ui/card";
+import { CircularTimer } from "@/components/workout-timer/circular-timer";
+import { ControlKnob } from "@/components/workout-timer/control-knob";
+import { useWorkoutTimer } from "@/hooks/use-workout-timer";
+import { Button } from "@/components/ui/button";
+import { Play, Pause, RotateCcw } from "lucide-react";
+
+export default function Home() {
+  const {
+    isRunning,
+    currentPhase,
+    timeLeft,
+    progress,
+    workoutDuration,
+    restDuration,
+    rounds,
+    setWorkoutDuration,
+    setRestDuration,
+    setRounds,
+    start,
+    pause,
+    reset
+  } = useWorkoutTimer();
+
+  return (
+    <div className="min-h-screen w-full bg-gradient-to-b from-background to-accent p-4 flex items-center justify-center">
+      <Card className="w-full max-w-3xl p-6 shadow-xl bg-background/95 backdrop-blur">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Workout Timer
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Set your intervals and get moving!
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex items-center justify-center">
+            <CircularTimer
+              progress={progress}
+              timeLeft={timeLeft}
+              phase={currentPhase}
+            />
+          </div>
+
+          <div className="space-y-8">
+            <div className="space-y-6">
+              <ControlKnob
+                label="Workout Duration"
+                value={workoutDuration}
+                onChange={setWorkoutDuration}
+                min={10}
+                max={300}
+                step={5}
+                unit="sec"
+              />
+              <ControlKnob
+                label="Rest Duration"
+                value={restDuration}
+                onChange={setRestDuration}
+                min={5}
+                max={120}
+                step={5}
+                unit="sec"
+              />
+              <ControlKnob
+                label="Rounds"
+                value={rounds}
+                onChange={setRounds}
+                min={1}
+                max={10}
+                step={1}
+                unit="rounds"
+              />
+            </div>
+
+            <div className="flex justify-center gap-4">
+              <Button
+                size="lg"
+                onClick={isRunning ? pause : start}
+                className="w-32"
+              >
+                {isRunning ? (
+                  <><Pause className="mr-2 h-4 w-4" /> Pause</>
+                ) : (
+                  <><Play className="mr-2 h-4 w-4" /> Start</>
+                )}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={reset}
+                className="w-32"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" /> Reset
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
