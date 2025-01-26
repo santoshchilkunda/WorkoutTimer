@@ -6,9 +6,10 @@ interface WorkoutDetailsProps {
   currentSet: number;
   totalSets: number;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export function WorkoutDetails({ details, currentSet, totalSets, className = "" }: WorkoutDetailsProps) {
+export function WorkoutDetails({ details, currentSet, totalSets, className = "", children }: WorkoutDetailsProps) {
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex justify-between items-center mb-2">
@@ -22,6 +23,7 @@ export function WorkoutDetails({ details, currentSet, totalSets, className = "" 
         readOnly
         className="h-[300px] resize-none bg-muted/50"
       />
+      {children}
     </div>
   );
 }
