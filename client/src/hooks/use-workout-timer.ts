@@ -38,6 +38,7 @@ export function useWorkoutTimer() {
   // Calculate total workout time for all sets
   const totalTime = useMemo(() => {
     return sets.reduce((total, set) => {
+      // Only include workout and rest duration, exclude initial countdown
       return total + (set.workoutDuration + set.restDuration) * set.rounds;
     }, 0);
   }, [sets]);
