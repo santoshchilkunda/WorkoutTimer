@@ -65,7 +65,7 @@ export function CircularTimer({ progress, timeLeft, phase, currentRound, totalRo
         </div>
         {phase !== "idle" && currentRound && totalRounds && (
           <div className="text-sm text-muted-foreground mt-1">
-            Round {currentRound} of {totalRounds}
+            Round: {currentRound} / {totalRounds}
           </div>
         )}
       </div>

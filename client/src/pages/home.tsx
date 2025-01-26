@@ -18,6 +18,7 @@ export default function Home() {
     workoutDuration,
     restDuration,
     rounds,
+    currentRound,
     setWorkoutDuration,
     setRestDuration,
     setRounds,
@@ -61,7 +62,7 @@ export default function Home() {
               progress={progress}
               timeLeft={timeLeft}
               phase={currentPhase}
-              currentRound={currentPhase !== "idle" ? currentPhase : undefined}
+              currentRound={currentPhase !== "idle" ? currentRound : undefined}
               totalRounds={currentPhase !== "idle" ? rounds : undefined}
             />
           </div>
