@@ -28,7 +28,8 @@ export function useWorkoutTimer() {
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 4 && prev > 0) {
+        // Changed from 4 to 3 for countdown sound
+        if (prev <= 3 && prev > 0) {
           audioManager.playCountdown();
         }
 
@@ -37,7 +38,7 @@ export function useWorkoutTimer() {
             if (currentRound >= rounds) {
               setIsRunning(false);
               setCurrentPhase("idle");
-              audioManager.playComplete(); // Play completion sound
+              audioManager.playComplete();
               return workoutDuration;
             }
             audioManager.playPhaseChange();
