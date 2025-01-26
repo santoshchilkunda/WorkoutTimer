@@ -14,7 +14,7 @@ export default function Home() {
   const {
     sets,
     currentSetIndex,
-    setCurrentSetIndex, // Added this line
+    setCurrentSetIndex,
     currentSet,
     isRunning,
     currentPhase,
@@ -66,12 +66,14 @@ export default function Home() {
               phase={currentPhase}
               currentRound={currentRound}
               totalRounds={currentSet.rounds}
+              currentSet={currentSetIndex + 1}
+              totalSets={sets.length}
             />
           </div>
 
           <div className="space-y-6">
-            <Tabs 
-              value={currentSetIndex.toString()} 
+            <Tabs
+              value={currentSetIndex.toString()}
               onValueChange={(value) => setCurrentSetIndex(parseInt(value))}
               className="w-full"
             >

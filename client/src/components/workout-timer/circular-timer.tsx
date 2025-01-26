@@ -22,9 +22,19 @@ interface CircularTimerProps {
   phase: "workout" | "rest" | "idle";
   currentRound?: number;
   totalRounds?: number;
+  currentSet?: number;
+  totalSets?: number;
 }
 
-export function CircularTimer({ progress, timeLeft, phase, currentRound, totalRounds }: CircularTimerProps) {
+export function CircularTimer({ 
+  progress, 
+  timeLeft, 
+  phase, 
+  currentRound, 
+  totalRounds,
+  currentSet,
+  totalSets 
+}: CircularTimerProps) {
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress);
@@ -63,8 +73,9 @@ export function CircularTimer({ progress, timeLeft, phase, currentRound, totalRo
         }`}>
           {phase === "workout" ? "WORKOUT" : phase === "rest" ? "REST" : "READY"}
         </div>
-        <div className="text-sm text-muted-foreground mt-1">
-          Round: {currentRound || 1} / {totalRounds || 1}
+        <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
+          <div>Round: {currentRound || 1} / {totalRounds || 1}</div>
+          <div>Set: {currentSet || 1} / {totalSets || 1}</div>
         </div>
       </div>
     </div>

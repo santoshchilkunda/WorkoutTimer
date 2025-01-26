@@ -18,7 +18,6 @@ const DEFAULT_SET: WorkoutSet = {
 export function useWorkoutTimer() {
   const [sets, setSets] = useState<WorkoutSet[]>([{ ...DEFAULT_SET }]);
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
-
   const [currentRound, setCurrentRound] = useState(1);
   const [currentPhase, setCurrentPhase] = useState<Phase>("idle");
   const [timeLeft, setTimeLeft] = useState(sets[0].workoutDuration);
@@ -35,9 +34,9 @@ export function useWorkoutTimer() {
   useEffect(() => {
     if (!isRunning) {
       setTimeLeft(
-        currentPhase === "workout" ? currentSet.workoutDuration : 
-        currentPhase === "rest" ? currentSet.restDuration : 
-        currentSet.workoutDuration
+        currentPhase === "workout" ? currentSet.workoutDuration :
+          currentPhase === "rest" ? currentSet.restDuration :
+            currentSet.workoutDuration
       );
     }
   }, [currentSet.workoutDuration, currentSet.restDuration, currentPhase, isRunning]);
@@ -61,13 +60,13 @@ export function useWorkoutTimer() {
       return prev.filter((_, i) => i !== index);
     });
     // Adjust currentSetIndex if necessary
-    setCurrentSetIndex(current => 
+    setCurrentSetIndex(current =>
       index <= current ? Math.max(0, current - 1) : current
     );
   }, []);
 
   const updateSet = useCallback((index: number, updates: Partial<WorkoutSet>) => {
-    setSets(prev => prev.map((set, i) => 
+    setSets(prev => prev.map((set, i) =>
       i === index ? { ...set, ...updates } : set
     ));
   }, []);
@@ -75,6 +74,9 @@ export function useWorkoutTimer() {
   const start = async () => {
     // Ensure audio is initialized and resume if needed
     await audioManager.initializeAudio();
+    // Reset to first set when starting
+    setCurrentSetIndex(0);
+    setCurrentRound(1);
     setCurrentPhase("workout");
     setIsRunning(true);
   };
