@@ -5,8 +5,9 @@ class AudioManager {
   private muted: boolean = false;
   private youtubePlayer: any = null;
 
-  private initAudioContext() {
-    if (!this.audioContext) {
+  constructor() {
+    // Initialize audio context immediately
+    try {
       this.audioContext = new AudioContext();
       this.gainNode = this.audioContext.createGain();
       this.youtubeGainNode = this.audioContext.createGain();
@@ -14,6 +15,14 @@ class AudioManager {
       this.youtubeGainNode.connect(this.audioContext.destination);
       this.setVolume(0.3);
       this.setYoutubeVolume(1);
+    } catch (error) {
+      console.error('Failed to initialize audio context:', error);
+    }
+  }
+
+  private async ensureAudioContext() {
+    if (this.audioContext?.state === 'suspended') {
+      await this.audioContext.resume();
     }
   }
 
@@ -38,9 +47,10 @@ class AudioManager {
     this.setVolume(this.gainNode?.gain.value || 0.3);
   }
 
-  playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
-    this.initAudioContext();
+  async playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
     if (!this.audioContext || !this.gainNode || this.muted) return;
+
+    await this.ensureAudioContext();
 
     // Temporarily reduce YouTube volume during sound effects
     if (this.youtubePlayer) {
@@ -59,19 +69,19 @@ class AudioManager {
     oscillator.stop(this.audioContext.currentTime + duration);
   }
 
-  playPhaseChange() {
+  async playPhaseChange() {
     // Higher pitch for workout, lower for rest
-    this.playTone(880, 0.15, 'triangle');
+    await this.playTone(880, 0.15, 'triangle');
     setTimeout(() => this.playTone(660, 0.15, 'triangle'), 200);
   }
 
-  playCountdown() {
-    this.playTone(440, 0.1, 'sine');
+  async playCountdown() {
+    await this.playTone(440, 0.1, 'sine');
   }
 
-  playComplete() {
+  async playComplete() {
     // Play a success sound when workout is complete
-    this.playTone(880, 0.15, 'sine');
+    await this.playTone(880, 0.15, 'sine');
     setTimeout(() => this.playTone(1100, 0.2, 'sine'), 200);
   }
 }
