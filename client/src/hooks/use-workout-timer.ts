@@ -96,6 +96,10 @@ export function useWorkoutTimer() {
 
         if (prev <= 0) {
           if (currentPhase === "workout") {
+            void audioManager.playPhaseChange();
+            setCurrentPhase("rest");
+            return currentSet.restDuration;
+          } else if (currentPhase === "rest") {
             if (currentRound >= currentSet.rounds) {
               // Check if there are more sets
               if (currentSetIndex < sets.length - 1) {
@@ -111,15 +115,12 @@ export function useWorkoutTimer() {
                 void audioManager.playComplete();
                 return currentSet.workoutDuration;
               }
+            } else {
+              void audioManager.playPhaseChange();
+              setCurrentPhase("workout");
+              setCurrentRound((r) => r + 1);
+              return currentSet.workoutDuration;
             }
-            void audioManager.playPhaseChange();
-            setCurrentPhase("rest");
-            return currentSet.restDuration;
-          } else {
-            void audioManager.playPhaseChange();
-            setCurrentPhase("workout");
-            setCurrentRound((r) => r + 1);
-            return currentSet.workoutDuration;
           }
         }
         return prev - 0.1;
