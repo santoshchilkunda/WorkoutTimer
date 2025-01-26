@@ -81,6 +81,8 @@ export default function Home() {
             {isRunning && (
               <WorkoutDetails
                 details={currentSet.details || ""}
+                currentSet={currentSetIndex + 1}
+                totalSets={sets.length}
                 className="mt-4 md:mt-0"
               />
             )}

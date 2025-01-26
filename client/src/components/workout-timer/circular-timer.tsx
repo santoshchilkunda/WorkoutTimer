@@ -24,8 +24,6 @@ interface CircularTimerProps {
   phase: "workout" | "rest" | "idle" | "countdown";
   currentRound?: number;
   totalRounds?: number;
-  currentSet?: number;
-  totalSets?: number;
 }
 
 export function CircularTimer({ 
@@ -33,9 +31,7 @@ export function CircularTimer({
   timeLeft, 
   phase, 
   currentRound, 
-  totalRounds,
-  currentSet,
-  totalSets 
+  totalRounds
 }: CircularTimerProps) {
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
@@ -108,10 +104,11 @@ export function CircularTimer({
            phase === "countdown" ? "GET READY" :
            "READY"}
         </div>
-        <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
-          <div>Round: {currentRound || 1} / {totalRounds || 1}</div>
-          <div>Set: {currentSet || 1} / {totalSets || 1}</div>
-        </div>
+        {(currentRound && totalRounds) && (
+          <div className="text-sm text-muted-foreground mt-1">
+            Round: {currentRound} / {totalRounds}
+          </div>
+        )}
       </div>
     </div>
   );
