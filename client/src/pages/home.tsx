@@ -6,7 +6,7 @@ import { StatusBar } from "@/components/workout-timer/status-bar";
 import { WorkoutDetails } from "@/components/workout-timer/workout-details";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw, Volume2, VolumeX, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { audioManager } from "@/lib/audio";
 import { Slider } from "@/components/ui/slider";
@@ -59,7 +59,7 @@ export default function Home() {
   };
 
   const handleBack = () => {
-    reset();
+    pause();
     setMode("setup");
   };
 
@@ -76,6 +76,13 @@ export default function Home() {
         </div>
 
         <div className="space-y-8">
+          {/* Status bar always visible */}
+          <StatusBar
+            totalTime={totalTime}
+            elapsedTime={elapsedTime}
+            currentPhase={currentPhase === "countdown" ? "workout" : currentPhase}
+          />
+
           {mode === "setup" ? (
             // Setup mode layout
             <>
@@ -237,8 +244,6 @@ export default function Home() {
                     phase={currentPhase}
                     currentRound={currentRound}
                     totalRounds={currentSet.rounds}
-                    currentSet={currentSetIndex + 1}
-                    totalSets={sets.length}
                   />
                 </div>
 
@@ -277,12 +282,6 @@ export default function Home() {
                   />
                 </div>
               </div>
-
-              <StatusBar
-                totalTime={totalTime}
-                elapsedTime={elapsedTime}
-                currentPhase={currentPhase === "countdown" ? "workout" : currentPhase}
-              />
 
               <div className="flex justify-center gap-4">
                 <Button
