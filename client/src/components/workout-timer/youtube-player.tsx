@@ -3,6 +3,7 @@ import YouTube from "react-youtube";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { Play, Pause } from "lucide-react";
 
 interface YouTubePlayerProps {
   onPlayerReady: (player: any) => void;
@@ -19,6 +20,8 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
   const [url, setUrl] = useState("");
   const [videoId, setVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [player, setPlayer] = useState<any>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +46,10 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
     // After playback starts, unmute and adjust volume
     setTimeout(() => {
       event.target.unMute();
+      setPlayer(event.target);
       onPlayerReady(event.target);
       setLoading(false);
+      setIsPlaying(true);
     }, 100);
   };
 
@@ -56,6 +61,19 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
       description: "Unable to play this video. Please try another URL."
     });
     setVideoId(null);
+    setIsPlaying(false);
+  };
+
+  const togglePlayPause = () => {
+    if (!player) return;
+
+    if (isPlaying) {
+      player.pauseVideo();
+      setIsPlaying(false);
+    } else {
+      player.playVideo();
+      setIsPlaying(true);
+    }
   };
 
   return (
@@ -68,9 +86,20 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
           onChange={(e) => setUrl(e.target.value)}
           className="flex-1"
         />
-        <Button type="submit" disabled={loading}>
-          {loading ? "Loading..." : "Load"}
-        </Button>
+        {videoId ? (
+          <Button 
+            type="button"
+            onClick={togglePlayPause}
+            disabled={loading || !player}
+            variant="outline"
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </Button>
+        ) : (
+          <Button type="submit" disabled={loading}>
+            Add Music
+          </Button>
+        )}
       </form>
 
       {videoId && (
