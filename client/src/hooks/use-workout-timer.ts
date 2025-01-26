@@ -52,6 +52,7 @@ export function useWorkoutTimer() {
 
   const addSet = useCallback(() => {
     setSets(prev => [...prev, { ...DEFAULT_SET }]);
+    setCurrentSetIndex(prev => prev + 1); // Set focus to the newly added set
   }, []);
 
   const removeSet = useCallback((index: number) => {
