@@ -35,7 +35,6 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
     }
   }));
 
-  // Helper function to extract video ID from YouTube URL
   function extractVideoId(url: string) {
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = url.match(regExp);
@@ -43,7 +42,6 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
   }
 
   useEffect(() => {
-    // Cleanup function
     return () => {
       if (player) {
         try {
@@ -74,19 +72,12 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
     try {
       const ytPlayer = event.target;
       setPlayer(ytPlayer);
-
-      // Ensure player is unmuted and volume is at max
       ytPlayer.unMute();
       ytPlayer.setVolume(100);
-
-      // Start playing
       ytPlayer.playVideo();
       onPlayerReady(ytPlayer);
       setLoading(false);
       setIsPlaying(true);
-
-      // Log player state for debugging
-      console.log('YouTube Player State:', ytPlayer.getPlayerState());
     } catch (error) {
       console.error('YouTube player initialization error:', error);
       handleError();
@@ -98,16 +89,15 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
     toast({
       variant: "destructive",
       title: "Playback Error",
-      description: "Unable to play this video. Please try another URL."
+      description: "Unable to play this audio. Please try another URL."
     });
     setVideoId(null);
     setIsPlaying(false);
   };
 
   const handleStateChange = (event: any) => {
-    // Update playing state based on player state
     const playerState = event.data;
-    setIsPlaying(playerState === 1); // 1 is playing state
+    setIsPlaying(playerState === 1);
   };
 
   const togglePlayPause = () => {
@@ -143,6 +133,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
             onClick={togglePlayPause}
             disabled={loading || !player}
             variant="outline"
+            size="icon"
           >
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           </Button>
@@ -154,12 +145,12 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
       </form>
 
       {videoId && (
-        <div className="relative">
+        <div className="hidden">
           <YouTube
             videoId={videoId}
             opts={{
-              height: '200',
-              width: '100%',
+              height: '1',
+              width: '1',
               playerVars: {
                 autoplay: 1,
                 controls: 0,
@@ -173,7 +164,6 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
             onReady={handleReady}
             onStateChange={handleStateChange}
             onError={handleError}
-            className="w-full"
           />
         </div>
       )}
