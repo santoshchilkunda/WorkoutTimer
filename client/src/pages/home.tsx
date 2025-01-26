@@ -14,6 +14,7 @@ export default function Home() {
   const {
     sets,
     currentSetIndex,
+    setCurrentSetIndex, // Added this line
     currentSet,
     isRunning,
     currentPhase,
@@ -69,7 +70,11 @@ export default function Home() {
           </div>
 
           <div className="space-y-6">
-            <Tabs value={currentSetIndex.toString()} className="w-full">
+            <Tabs 
+              value={currentSetIndex.toString()} 
+              onValueChange={(value) => setCurrentSetIndex(parseInt(value))}
+              className="w-full"
+            >
               <div className="flex items-center justify-between mb-4">
                 <TabsList>
                   {sets.map((_, index) => (
@@ -77,7 +82,6 @@ export default function Home() {
                       key={index}
                       value={index.toString()}
                       disabled={isRunning}
-                      onClick={() => !isRunning && updateSet(index, sets[index])}
                     >
                       Set {index + 1}
                     </TabsTrigger>
