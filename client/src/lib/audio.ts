@@ -4,6 +4,7 @@ class AudioManager {
   private youtubeGainNode: GainNode | null = null;
   private muted: boolean = false;
   private youtubePlayer: any = null;
+  private baseYoutubeVolume: number = 1;
 
   constructor() {}
 
@@ -11,6 +12,7 @@ class AudioManager {
     this.youtubePlayer = player;
     if (player) {
       player.setVolume(100);
+      this.baseYoutubeVolume = 1;
     }
   }
 
@@ -22,7 +24,13 @@ class AudioManager {
 
   setYoutubeVolume(volume: number) {
     if (this.youtubeGainNode) {
-      this.youtubeGainNode.gain.value = Math.max(0, Math.min(1, volume));
+      // Use exponential ramping for smoother volume transitions
+      const now = this.audioContext?.currentTime || 0;
+      this.youtubeGainNode.gain.setTargetAtTime(
+        Math.max(0, Math.min(1, volume)),
+        now,
+        0.1 // Time constant for smooth transition
+      );
     }
   }
 
@@ -56,14 +64,27 @@ class AudioManager {
 
     // Temporarily reduce YouTube volume during sound effects
     if (this.youtubePlayer) {
-      const currentVolume = this.youtubeGainNode?.gain.value || 1;
-      // Reduce to 20% of current volume (more noticeable reduction)
-      this.setYoutubeVolume(currentVolume * 0.2);
-      setTimeout(() => this.setYoutubeVolume(currentVolume), duration * 1000 + 100);
+      const currentVolume = this.baseYoutubeVolume;
+      // Reduce to 40% of current volume (less dramatic reduction)
+      this.setYoutubeVolume(currentVolume * 0.4);
+
+      // Restore volume gradually
+      setTimeout(() => {
+        this.setYoutubeVolume(currentVolume);
+      }, duration * 1000 + 100);
     }
 
     const oscillator = this.audioContext.createOscillator();
-    oscillator.connect(this.gainNode);
+    const gainNode = this.audioContext.createGain();
+
+    // Create a separate gain node for envelope
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.7, this.audioContext.currentTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(this.gainNode);
+
     oscillator.frequency.value = frequency;
     oscillator.type = type;
 
