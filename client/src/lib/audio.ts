@@ -5,29 +5,13 @@ class AudioManager {
   private muted: boolean = false;
   private youtubePlayer: any = null;
 
-  constructor() {
-    // Initialize audio context immediately
-    try {
-      this.audioContext = new AudioContext();
-      this.gainNode = this.audioContext.createGain();
-      this.youtubeGainNode = this.audioContext.createGain();
-      this.gainNode.connect(this.audioContext.destination);
-      this.youtubeGainNode.connect(this.audioContext.destination);
-      this.setVolume(0.3);
-      this.setYoutubeVolume(1);
-    } catch (error) {
-      console.error('Failed to initialize audio context:', error);
-    }
-  }
-
-  private async ensureAudioContext() {
-    if (this.audioContext?.state === 'suspended') {
-      await this.audioContext.resume();
-    }
-  }
+  constructor() {}
 
   setYoutubePlayer(player: any) {
     this.youtubePlayer = player;
+    if (player) {
+      player.setVolume(100);
+    }
   }
 
   setVolume(volume: number) {
@@ -47,10 +31,28 @@ class AudioManager {
     this.setVolume(this.gainNode?.gain.value || 0.3);
   }
 
+  async initializeAudio() {
+    if (!this.audioContext) {
+      try {
+        this.audioContext = new AudioContext();
+        this.gainNode = this.audioContext.createGain();
+        this.youtubeGainNode = this.audioContext.createGain();
+        this.gainNode.connect(this.audioContext.destination);
+        this.youtubeGainNode.connect(this.audioContext.destination);
+        this.setVolume(0.3);
+        this.setYoutubeVolume(1);
+      } catch (error) {
+        console.error('Failed to initialize audio context:', error);
+      }
+    }
+
+    if (this.audioContext?.state === 'suspended') {
+      await this.audioContext.resume();
+    }
+  }
+
   async playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
     if (!this.audioContext || !this.gainNode || this.muted) return;
-
-    await this.ensureAudioContext();
 
     // Temporarily reduce YouTube volume during sound effects
     if (this.youtubePlayer) {

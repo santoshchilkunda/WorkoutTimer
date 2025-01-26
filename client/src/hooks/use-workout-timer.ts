@@ -38,7 +38,12 @@ export function useWorkoutTimer() {
     setIsRunning(false);
   }, []);
 
-  const start = () => setIsRunning(true);
+  const start = async () => {
+    // Initialize audio when user starts the timer
+    await audioManager.initializeAudio();
+    setIsRunning(true);
+  };
+
   const pause = () => setIsRunning(false);
 
   useEffect(() => {
