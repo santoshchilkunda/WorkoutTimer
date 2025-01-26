@@ -39,18 +39,23 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
   };
 
   const handleReady = (event: any) => {
-    // Ensure video is muted initially to allow autoplay
-    event.target.mute();
-    // Start playing
-    event.target.playVideo();
-    // After playback starts, unmute and adjust volume
-    setTimeout(() => {
-      event.target.unMute();
-      setPlayer(event.target);
-      onPlayerReady(event.target);
-      setLoading(false);
-      setIsPlaying(true);
-    }, 100);
+    try {
+      // Ensure video is muted initially to allow autoplay
+      event.target.mute();
+      // Start playing
+      event.target.playVideo();
+      // After playback starts, unmute and adjust volume
+      setTimeout(() => {
+        event.target.unMute();
+        setPlayer(event.target);
+        onPlayerReady(event.target);
+        setLoading(false);
+        setIsPlaying(true);
+      }, 100);
+    } catch (error) {
+      console.error('YouTube player initialization error:', error);
+      handleError();
+    }
   };
 
   const handleError = () => {
@@ -67,12 +72,17 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
   const togglePlayPause = () => {
     if (!player) return;
 
-    if (isPlaying) {
-      player.pauseVideo();
-      setIsPlaying(false);
-    } else {
-      player.playVideo();
-      setIsPlaying(true);
+    try {
+      if (isPlaying) {
+        player.pauseVideo();
+        setIsPlaying(false);
+      } else {
+        player.playVideo();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('YouTube player control error:', error);
+      handleError();
     }
   };
 
