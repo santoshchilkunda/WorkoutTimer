@@ -36,7 +36,8 @@ export function useWorkoutTimer() {
   // Calculate total workout time for all sets
   const totalTime = useMemo(() => {
     return sets.reduce((total, set) => {
-      return total + (set.initialCountdown + (set.workoutDuration + set.restDuration) * set.rounds);
+      // Only include workout and rest durations multiplied by rounds
+      return total + (set.workoutDuration + set.restDuration) * set.rounds;
     }, 0);
   }, [sets]);
 
@@ -45,9 +46,9 @@ export function useWorkoutTimer() {
     if (!isRunning) {
       setTimeLeft(
         currentPhase === "workout" ? currentSet.workoutDuration :
-        currentPhase === "rest" ? currentSet.restDuration :
-        currentPhase === "countdown" ? currentSet.initialCountdown :
-        currentSet.workoutDuration
+          currentPhase === "rest" ? currentSet.restDuration :
+            currentPhase === "countdown" ? currentSet.initialCountdown :
+              currentSet.workoutDuration
       );
     }
   }, [currentSet.workoutDuration, currentSet.restDuration, currentSet.initialCountdown, currentPhase, isRunning]);
@@ -146,9 +147,9 @@ export function useWorkoutTimer() {
 
   const progress = timeLeft / (
     currentPhase === "workout" ? currentSet.workoutDuration :
-    currentPhase === "rest" ? currentSet.restDuration :
-    currentPhase === "countdown" ? currentSet.initialCountdown :
-    currentSet.workoutDuration
+      currentPhase === "rest" ? currentSet.restDuration :
+        currentPhase === "countdown" ? currentSet.initialCountdown :
+          currentSet.workoutDuration
   );
 
   return {
