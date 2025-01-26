@@ -95,8 +95,8 @@ export default function Home() {
       </div>
 
       <div className="flex justify-center gap-4">
-        <Button 
-          size="lg" 
+        <Button
+          size="lg"
           onClick={pause}
           className="w-32"
         >
@@ -127,7 +127,7 @@ export default function Home() {
 
       <div className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="flex flex-col items-center justify-center">
             <CircularTimer
               progress={progress}
               timeLeft={timeLeft}
@@ -137,18 +137,20 @@ export default function Home() {
               currentSet={currentSetIndex + 1}
               totalSets={sets.length}
             />
-            <div className="w-full max-w-sm">
-              <StatusBar
-                totalTime={totalTime}
-                elapsedTime={elapsedTime}
-                currentPhase={currentPhase}
-              />
-            </div>
           </div>
 
           <WorkoutDetails
             details={currentSet.details || ""}
             className="mt-4 md:mt-0"
+          />
+        </div>
+
+        {/* Status bar spanning full width */}
+        <div className="w-full max-w-none mb-8">
+          <StatusBar
+            totalTime={totalTime}
+            elapsedTime={elapsedTime}
+            currentPhase={currentPhase}
           />
         </div>
 
