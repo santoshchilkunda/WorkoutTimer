@@ -144,7 +144,10 @@ export function useWorkoutTimer() {
         return prev - 0.1;
       });
 
-      setElapsedTime(prev => prev + 0.1);
+      // Only increment elapsed time during workout or rest phases
+      if (currentPhase === "workout" || currentPhase === "rest") {
+        setElapsedTime(prev => prev + 0.1);
+      }
     }, 100);
 
     return () => clearInterval(interval);
