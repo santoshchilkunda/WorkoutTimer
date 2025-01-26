@@ -8,19 +8,12 @@ interface StatusBarProps {
 
 export function StatusBar({ totalTime, elapsedTime, currentPhase }: StatusBarProps) {
   const progress = (elapsedTime / totalTime) * 100;
-  
-  // Format time as mm:ss
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   return (
     <div className="w-full space-y-2">
       <div className="flex justify-between text-sm text-muted-foreground">
-        <span>{formatTime(elapsedTime)}</span>
-        <span>{formatTime(totalTime)}</span>
+        <span>{Math.round(progress)}%</span>
+        <span>{Math.round((1 - progress / 100) * totalTime)}s remaining</span>
       </div>
       <Progress 
         value={progress} 
