@@ -1,13 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { CircularTimer } from "@/components/workout-timer/circular-timer";
 import { ControlKnob } from "@/components/workout-timer/control-knob";
-import { YouTubePlayer } from "@/components/workout-timer/youtube-player";
+import { YouTubePlayer, YouTubePlayerRef } from "@/components/workout-timer/youtube-player";
 import { StatusBar } from "@/components/workout-timer/status-bar";
 import { WorkoutDetails } from "@/components/workout-timer/workout-details";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Volume2, VolumeX, Plus, Trash2, ArrowLeft, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { audioManager } from "@/lib/audio";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,6 +38,7 @@ export default function Home() {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [mode, setMode] = useState<"setup" | "workout">("setup");
+  const youtubePlayerRef = useRef<YouTubePlayerRef>(null);
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume);
@@ -61,6 +62,11 @@ export default function Home() {
   const handleBack = () => {
     pause();
     setMode("setup");
+  };
+
+  const handleReset = () => {
+    reset();
+    youtubePlayerRef.current?.reset();
   };
 
   return (
@@ -206,7 +212,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  onClick={reset}
+                  onClick={handleReset}
                   className="w-32"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" /> Reset
@@ -258,7 +264,10 @@ export default function Home() {
           {/* YouTube player and audio controls - always visible */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium">Audio Settings</h3>
-            <YouTubePlayer onPlayerReady={handleYoutubePlayerReady} />
+            <YouTubePlayer 
+              ref={youtubePlayerRef}
+              onPlayerReady={handleYoutubePlayerReady} 
+            />
 
             <div className="flex items-center justify-between">
               <Button

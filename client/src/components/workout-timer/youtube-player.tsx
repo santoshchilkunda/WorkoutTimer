@@ -1,27 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import YouTube from "react-youtube";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Play, Pause } from "lucide-react";
 
+export interface YouTubePlayerRef {
+  reset: () => void;
+}
+
 interface YouTubePlayerProps {
   onPlayerReady: (player: any) => void;
 }
 
-// Helper function to extract video ID from YouTube URL
-function extractVideoId(url: string) {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
-}
-
-export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
+export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({ onPlayerReady }, ref) => {
   const [url, setUrl] = useState("");
   const [videoId, setVideoId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [player, setPlayer] = useState<any>(null);
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setUrl("");
+      setVideoId(null);
+      setIsPlaying(false);
+      if (player) {
+        try {
+          player.stopVideo();
+        } catch (error) {
+          console.error('Error stopping video:', error);
+        }
+      }
+    }
+  }));
+
+  // Helper function to extract video ID from YouTube URL
+  function extractVideoId(url: string) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  }
 
   useEffect(() => {
     // Cleanup function
@@ -150,4 +169,6 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
       )}
     </div>
   );
-}
+});
+
+YouTubePlayer.displayName = "YouTubePlayer";
