@@ -132,6 +132,7 @@ export function useWorkoutTimer() {
   return {
     sets,
     currentSetIndex,
+    setCurrentSetIndex,
     currentSet,
     currentRound,
     currentPhase,
