@@ -2,7 +2,7 @@ import { useState } from "react";
 import YouTube from "react-youtube";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { parseUrl } from "youtube-url-parser";
+import parse from "youtube-url-parser";
 
 interface YouTubePlayerProps {
   onPlayerReady: (player: any) => void;
@@ -14,7 +14,7 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = parseUrl(url);
+    const parsed = parse(url);
     if (parsed && typeof parsed === "string") {
       setVideoId(parsed);
     }
@@ -32,7 +32,7 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
         />
         <Button type="submit">Load</Button>
       </form>
-      
+
       {videoId && (
         <div className="relative aspect-video w-full overflow-hidden rounded-lg">
           <YouTube
