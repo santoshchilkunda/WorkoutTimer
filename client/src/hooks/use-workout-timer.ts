@@ -3,20 +3,25 @@ import { audioManager } from "@/lib/audio";
 
 type Phase = "workout" | "rest" | "idle";
 
-const INITIAL_STATE = {
+interface WorkoutSet {
+  workoutDuration: number;
+  restDuration: number;
+  rounds: number;
+}
+
+const DEFAULT_SET: WorkoutSet = {
   workoutDuration: 60,
   restDuration: 30,
   rounds: 3
 };
 
 export function useWorkoutTimer() {
-  const [workoutDuration, setWorkoutDuration] = useState(INITIAL_STATE.workoutDuration);
-  const [restDuration, setRestDuration] = useState(INITIAL_STATE.restDuration);
-  const [rounds, setRounds] = useState(INITIAL_STATE.rounds);
+  const [sets, setSets] = useState<WorkoutSet[]>([{ ...DEFAULT_SET }]);
+  const [currentSetIndex, setCurrentSetIndex] = useState(0);
 
   const [currentRound, setCurrentRound] = useState(1);
   const [currentPhase, setCurrentPhase] = useState<Phase>("idle");
-  const [timeLeft, setTimeLeft] = useState(workoutDuration);
+  const [timeLeft, setTimeLeft] = useState(sets[0].workoutDuration);
   const [isRunning, setIsRunning] = useState(false);
 
   // Initialize audio when component mounts
@@ -24,23 +29,47 @@ export function useWorkoutTimer() {
     audioManager.initializeAudio();
   }, []);
 
-  // Update timeLeft when durations change
+  const currentSet = sets[currentSetIndex];
+
+  // Update timeLeft when durations change or current set changes
   useEffect(() => {
     if (!isRunning) {
-      setTimeLeft(currentPhase === "workout" ? workoutDuration : 
-                 currentPhase === "rest" ? restDuration : 
-                 workoutDuration);
+      setTimeLeft(
+        currentPhase === "workout" ? currentSet.workoutDuration : 
+        currentPhase === "rest" ? currentSet.restDuration : 
+        currentSet.workoutDuration
+      );
     }
-  }, [workoutDuration, restDuration, currentPhase, isRunning]);
+  }, [currentSet.workoutDuration, currentSet.restDuration, currentPhase, isRunning]);
 
   const reset = useCallback(() => {
-    setWorkoutDuration(INITIAL_STATE.workoutDuration);
-    setRestDuration(INITIAL_STATE.restDuration);
-    setRounds(INITIAL_STATE.rounds);
+    setSets([{ ...DEFAULT_SET }]);
+    setCurrentSetIndex(0);
     setCurrentRound(1);
     setCurrentPhase("idle");
-    setTimeLeft(INITIAL_STATE.workoutDuration);
+    setTimeLeft(DEFAULT_SET.workoutDuration);
     setIsRunning(false);
+  }, []);
+
+  const addSet = useCallback(() => {
+    setSets(prev => [...prev, { ...DEFAULT_SET }]);
+  }, []);
+
+  const removeSet = useCallback((index: number) => {
+    setSets(prev => {
+      if (prev.length === 1) return prev; // Don't remove the last set
+      return prev.filter((_, i) => i !== index);
+    });
+    // Adjust currentSetIndex if necessary
+    setCurrentSetIndex(current => 
+      index <= current ? Math.max(0, current - 1) : current
+    );
+  }, []);
+
+  const updateSet = useCallback((index: number, updates: Partial<WorkoutSet>) => {
+    setSets(prev => prev.map((set, i) => 
+      i === index ? { ...set, ...updates } : set
+    ));
   }, []);
 
   const start = async () => {
@@ -64,20 +93,30 @@ export function useWorkoutTimer() {
 
         if (prev <= 0) {
           if (currentPhase === "workout") {
-            if (currentRound >= rounds) {
-              setIsRunning(false);
-              setCurrentPhase("idle");
-              void audioManager.playComplete();
-              return workoutDuration;
+            if (currentRound >= currentSet.rounds) {
+              // Check if there are more sets
+              if (currentSetIndex < sets.length - 1) {
+                void audioManager.playPhaseChange();
+                setCurrentSetIndex(prev => prev + 1);
+                setCurrentRound(1);
+                setCurrentPhase("workout");
+                return sets[currentSetIndex + 1].workoutDuration;
+              } else {
+                // Workout complete
+                setIsRunning(false);
+                setCurrentPhase("idle");
+                void audioManager.playComplete();
+                return currentSet.workoutDuration;
+              }
             }
             void audioManager.playPhaseChange();
             setCurrentPhase("rest");
-            return restDuration;
+            return currentSet.restDuration;
           } else {
             void audioManager.playPhaseChange();
             setCurrentPhase("workout");
             setCurrentRound((r) => r + 1);
-            return workoutDuration;
+            return currentSet.workoutDuration;
           }
         }
         return prev - 0.1;
@@ -85,23 +124,23 @@ export function useWorkoutTimer() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isRunning, currentPhase, currentRound, rounds, workoutDuration, restDuration]);
+  }, [isRunning, currentPhase, currentRound, currentSet, currentSetIndex, sets]);
 
   // Calculate progress percentage
-  const progress = timeLeft / (currentPhase === "workout" ? workoutDuration : restDuration);
+  const progress = timeLeft / (currentPhase === "workout" ? currentSet.workoutDuration : currentSet.restDuration);
 
   return {
-    workoutDuration,
-    restDuration,
-    rounds,
+    sets,
+    currentSetIndex,
+    currentSet,
     currentRound,
     currentPhase,
     timeLeft,
     isRunning,
     progress,
-    setWorkoutDuration,
-    setRestDuration,
-    setRounds,
+    addSet,
+    removeSet,
+    updateSet,
     start,
     pause,
     reset

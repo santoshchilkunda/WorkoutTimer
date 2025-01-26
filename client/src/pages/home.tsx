@@ -4,24 +4,25 @@ import { ControlKnob } from "@/components/workout-timer/control-knob";
 import { YouTubePlayer } from "@/components/workout-timer/youtube-player";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, RotateCcw, Volume2, VolumeX, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { audioManager } from "@/lib/audio";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   const {
+    sets,
+    currentSetIndex,
+    currentSet,
     isRunning,
     currentPhase,
     timeLeft,
     progress,
-    workoutDuration,
-    restDuration,
-    rounds,
     currentRound,
-    setWorkoutDuration,
-    setRestDuration,
-    setRounds,
+    addSet,
+    removeSet,
+    updateSet,
     start,
     pause,
     reset
@@ -63,38 +64,81 @@ export default function Home() {
               timeLeft={timeLeft}
               phase={currentPhase}
               currentRound={currentRound}
-              totalRounds={rounds}
+              totalRounds={currentSet.rounds}
             />
           </div>
 
           <div className="space-y-6">
-            <ControlKnob
-              label="Workout Duration"
-              value={workoutDuration}
-              onChange={setWorkoutDuration}
-              min={10}
-              max={300}
-              step={5}
-              unit="sec"
-            />
-            <ControlKnob
-              label="Rest Duration"
-              value={restDuration}
-              onChange={setRestDuration}
-              min={5}
-              max={120}
-              step={5}
-              unit="sec"
-            />
-            <ControlKnob
-              label="Rounds"
-              value={rounds}
-              onChange={setRounds}
-              min={1}
-              max={10}
-              step={1}
-              unit="rounds"
-            />
+            <Tabs value={currentSetIndex.toString()} className="w-full">
+              <div className="flex items-center justify-between mb-4">
+                <TabsList>
+                  {sets.map((_, index) => (
+                    <TabsTrigger
+                      key={index}
+                      value={index.toString()}
+                      disabled={isRunning}
+                      onClick={() => !isRunning && updateSet(index, sets[index])}
+                    >
+                      Set {index + 1}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={addSet}
+                    disabled={isRunning}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  {sets.length > 1 && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeSet(currentSetIndex)}
+                      disabled={isRunning}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {sets.map((set, index) => (
+                <TabsContent key={index} value={index.toString()}>
+                  <div className="space-y-6">
+                    <ControlKnob
+                      label="Workout Duration"
+                      value={set.workoutDuration}
+                      onChange={(value) => updateSet(index, { workoutDuration: value })}
+                      min={10}
+                      max={300}
+                      step={5}
+                      unit="sec"
+                    />
+                    <ControlKnob
+                      label="Rest Duration"
+                      value={set.restDuration}
+                      onChange={(value) => updateSet(index, { restDuration: value })}
+                      min={5}
+                      max={120}
+                      step={5}
+                      unit="sec"
+                    />
+                    <ControlKnob
+                      label="Rounds"
+                      value={set.rounds}
+                      onChange={(value) => updateSet(index, { rounds: value })}
+                      min={1}
+                      max={10}
+                      step={1}
+                      unit="rounds"
+                    />
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
 
             <div className="space-y-4">
               <h3 className="text-sm font-medium">Audio Settings</h3>
