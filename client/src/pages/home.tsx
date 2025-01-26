@@ -151,6 +151,15 @@ export default function Home() {
                       step={1}
                       unit="rounds"
                     />
+                    <ControlKnob
+                      label="Initial Countdown"
+                      value={set.initialCountdown}
+                      onChange={(value) => updateSet(index, { initialCountdown: value })}
+                      min={0}
+                      max={30}
+                      step={5}
+                      unit="sec"
+                    />
                   </div>
                 </TabsContent>
               ))}
