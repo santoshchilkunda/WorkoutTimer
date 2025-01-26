@@ -25,7 +25,7 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
       <form onSubmit={handleSubmit} className="flex gap-2">
         <Input
           type="text"
-          placeholder="Enter YouTube URL"
+          placeholder="Enter YouTube URL for workout music"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           className="flex-1"
@@ -34,20 +34,16 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
       </form>
 
       {videoId && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+        <div className="hidden">
           <YouTube
             videoId={videoId}
             opts={{
-              width: "100%",
-              height: "100%",
               playerVars: {
-                autoplay: 0,
-                controls: 1,
-                modestbranding: 1,
+                autoplay: 1,
+                controls: 0,
               },
             }}
             onReady={(event) => onPlayerReady(event.target)}
-            className="absolute inset-0"
           />
         </div>
       )}
