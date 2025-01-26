@@ -36,6 +36,14 @@ class AudioManager {
 
   toggleMute() {
     this.muted = !this.muted;
+    if (this.youtubePlayer) {
+      if (this.muted) {
+        this.youtubePlayer.mute();
+      } else {
+        this.youtubePlayer.unMute();
+        this.youtubePlayer.setVolume(100);
+      }
+    }
     this.setVolume(this.gainNode?.gain.value || 0.3);
   }
 
@@ -64,20 +72,19 @@ class AudioManager {
 
     // Temporarily reduce YouTube volume during sound effects
     if (this.youtubePlayer) {
-      const currentVolume = this.baseYoutubeVolume;
-      // Reduce to 40% of current volume (less dramatic reduction)
-      this.setYoutubeVolume(currentVolume * 0.4);
+      const currentVolume = this.youtubePlayer.getVolume() / 100;
+      // Reduce to 40% of current volume
+      this.youtubePlayer.setVolume(currentVolume * 40);
 
       // Restore volume gradually
       setTimeout(() => {
-        this.setYoutubeVolume(currentVolume);
+        this.youtubePlayer.setVolume(currentVolume * 100);
       }, duration * 1000 + 100);
     }
 
     const oscillator = this.audioContext.createOscillator();
     const gainNode = this.audioContext.createGain();
 
-    // Create a separate gain node for envelope
     gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.7, this.audioContext.currentTime + 0.01);
     gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + duration);
@@ -93,7 +100,6 @@ class AudioManager {
   }
 
   async playPhaseChange() {
-    // Higher pitch for workout, lower for rest
     await this.playTone(880, 0.15, 'triangle');
     setTimeout(() => this.playTone(660, 0.15, 'triangle'), 200);
   }
@@ -103,7 +109,6 @@ class AudioManager {
   }
 
   async playComplete() {
-    // Play a success sound when workout is complete
     await this.playTone(880, 0.15, 'sine');
     setTimeout(() => this.playTone(1100, 0.2, 'sine'), 200);
   }
