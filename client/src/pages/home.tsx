@@ -125,6 +125,15 @@ export default function Home() {
                 <TabsContent key={index} value={index.toString()}>
                   <div className="space-y-6">
                     <ControlKnob
+                      label="Initial Countdown"
+                      value={set.initialCountdown}
+                      onChange={(value) => updateSet(index, { initialCountdown: value })}
+                      min={0}
+                      max={30}
+                      step={5}
+                      unit="sec"
+                    />
+                    <ControlKnob
                       label="Workout Duration"
                       value={set.workoutDuration}
                       onChange={(value) => updateSet(index, { workoutDuration: value })}
@@ -150,15 +159,6 @@ export default function Home() {
                       max={10}
                       step={1}
                       unit="rounds"
-                    />
-                    <ControlKnob
-                      label="Initial Countdown"
-                      value={set.initialCountdown}
-                      onChange={(value) => updateSet(index, { initialCountdown: value })}
-                      min={0}
-                      max={30}
-                      step={5}
-                      unit="sec"
                     />
                   </div>
                 </TabsContent>
