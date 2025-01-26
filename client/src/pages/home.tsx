@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { CircularTimer } from "@/components/workout-timer/circular-timer";
 import { ControlKnob } from "@/components/workout-timer/control-knob";
+import { YouTubePlayer } from "@/components/workout-timer/youtube-player";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
@@ -38,9 +39,13 @@ export default function Home() {
     setIsMuted(!isMuted);
   };
 
+  const handleYoutubePlayerReady = (player: any) => {
+    audioManager.setYoutubePlayer(player);
+  };
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-background to-accent p-4 flex items-center justify-center">
-      <Card className="w-full max-w-3xl p-6 shadow-xl bg-background/95 backdrop-blur">
+      <Card className="w-full max-w-4xl p-6 shadow-xl bg-background/95 backdrop-blur">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             Workout Timer
@@ -50,16 +55,16 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="flex items-center justify-center">
-            <CircularTimer
-              progress={progress}
-              timeLeft={timeLeft}
-              phase={currentPhase}
-            />
-          </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-8">
+            <div className="flex items-center justify-center">
+              <CircularTimer
+                progress={progress}
+                timeLeft={timeLeft}
+                phase={currentPhase}
+              />
+            </div>
+
             <div className="space-y-6">
               <ControlKnob
                 label="Workout Duration"
@@ -114,29 +119,34 @@ export default function Home() {
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-center gap-4">
-              <Button
-                size="lg"
-                onClick={isRunning ? pause : start}
-                className="w-32"
-              >
-                {isRunning ? (
-                  <><Pause className="mr-2 h-4 w-4" /> Pause</>
-                ) : (
-                  <><Play className="mr-2 h-4 w-4" /> Start</>
-                )}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={reset}
-                className="w-32"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" /> Reset
-              </Button>
+              <div className="flex justify-center gap-4">
+                <Button
+                  size="lg"
+                  onClick={isRunning ? pause : start}
+                  className="w-32"
+                >
+                  {isRunning ? (
+                    <><Pause className="mr-2 h-4 w-4" /> Pause</>
+                  ) : (
+                    <><Play className="mr-2 h-4 w-4" /> Start</>
+                  )}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={reset}
+                  className="w-32"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" /> Reset
+                </Button>
+              </div>
             </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">Workout Music</h2>
+            <YouTubePlayer onPlayerReady={handleYoutubePlayerReady} />
           </div>
         </div>
       </Card>

@@ -1,20 +1,38 @@
 class AudioManager {
   private audioContext: AudioContext | null = null;
   private gainNode: GainNode | null = null;
+  private youtubeGainNode: GainNode | null = null;
   private muted: boolean = false;
+  private youtubePlayer: any = null;
 
   private initAudioContext() {
     if (!this.audioContext) {
       this.audioContext = new AudioContext();
       this.gainNode = this.audioContext.createGain();
+      this.youtubeGainNode = this.audioContext.createGain();
       this.gainNode.connect(this.audioContext.destination);
+      this.youtubeGainNode.connect(this.audioContext.destination);
       this.setVolume(0.3);
+      this.setYoutubeVolume(1);
+    }
+  }
+
+  setYoutubePlayer(player: any) {
+    this.youtubePlayer = player;
+    if (player) {
+      player.setVolume(100);
     }
   }
 
   setVolume(volume: number) {
     if (this.gainNode) {
       this.gainNode.gain.value = this.muted ? 0 : Math.max(0, Math.min(1, volume));
+    }
+  }
+
+  setYoutubeVolume(volume: number) {
+    if (this.youtubeGainNode) {
+      this.youtubeGainNode.gain.value = Math.max(0, Math.min(1, volume));
     }
   }
 
@@ -26,6 +44,13 @@ class AudioManager {
   playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
     this.initAudioContext();
     if (!this.audioContext || !this.gainNode || this.muted) return;
+
+    // Temporarily reduce YouTube volume during sound effects
+    if (this.youtubePlayer) {
+      const currentVolume = this.youtubeGainNode?.gain.value || 1;
+      this.setYoutubeVolume(currentVolume * 0.3);
+      setTimeout(() => this.setYoutubeVolume(currentVolume), duration * 1000 + 100);
+    }
 
     const oscillator = this.audioContext.createOscillator();
     oscillator.connect(this.gainNode);
