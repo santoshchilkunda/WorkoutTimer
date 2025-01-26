@@ -45,7 +45,10 @@ export function CircularTimer({
   const [flash, setFlash] = useState(false);
 
   useEffect(() => {
-    if (phase !== "countdown") return;
+    if (phase !== "countdown") {
+      setFlash(false);
+      return;
+    }
 
     const interval = setInterval(() => {
       setFlash(prev => !prev);
@@ -82,7 +85,7 @@ export function CircularTimer({
           cx="150"
           cy="150"
           r={radius}
-          className={`fill-none stroke-current stroke-[12] transition-all duration-500 ${getStrokeColor()}`}
+          className={`fill-none stroke-current stroke-[12] transition-all duration-300 ${getStrokeColor()}`}
           style={{
             strokeDasharray: circumference,
             strokeDashoffset,
@@ -91,13 +94,13 @@ export function CircularTimer({
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <div className="text-6xl font-bold tabular-nums">
+        <div className={`text-6xl font-bold tabular-nums ${phase === 'countdown' ? (flash ? 'text-blue-500' : 'text-blue-300') : ''}`}>
           {Math.ceil(timeLeft)}
         </div>
         <div className={`text-lg font-medium mt-2 ${
           phase === "workout" ? "text-primary" :
           phase === "rest" ? "text-orange-500" :
-          phase === "countdown" ? "text-blue-500" :
+          phase === "countdown" ? (flash ? "text-blue-500" : "text-blue-300") :
           ""
         }`}>
           {phase === "workout" ? "WORKOUT" :
