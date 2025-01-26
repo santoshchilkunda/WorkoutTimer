@@ -3,7 +3,6 @@ import { CircularTimer } from "@/components/workout-timer/circular-timer";
 import { ControlKnob } from "@/components/workout-timer/control-knob";
 import { YouTubePlayer } from "@/components/workout-timer/youtube-player";
 import { StatusBar } from "@/components/workout-timer/status-bar";
-import { WorkoutDetails } from "@/components/workout-timer/workout-details";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Plus, Trash2 } from "lucide-react";
@@ -74,11 +73,6 @@ export default function Home() {
         </div>
 
         <div className="space-y-8">
-          <WorkoutDetails
-            details={currentSet.details || ""}
-            className="mt-4 md:mt-0"
-          />
-
           <div className="space-y-4">
             <YouTubePlayer onPlayerReady={handleYoutubePlayerReady} />
           </div>
@@ -126,22 +120,15 @@ export default function Home() {
       </div>
 
       <div className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <div className="flex flex-col items-center justify-center">
-            <CircularTimer
-              progress={progress}
-              timeLeft={timeLeft}
-              phase={currentPhase}
-              currentRound={currentRound}
-              totalRounds={currentSet.rounds}
-              currentSet={currentSetIndex + 1}
-              totalSets={sets.length}
-            />
-          </div>
-
-          <WorkoutDetails
-            details={currentSet.details || ""}
-            className="mt-4 md:mt-0"
+        <div className="flex justify-center mb-8">
+          <CircularTimer
+            progress={progress}
+            timeLeft={timeLeft}
+            phase={currentPhase}
+            currentRound={currentRound}
+            totalRounds={currentSet.rounds}
+            currentSet={currentSetIndex + 1}
+            totalSets={sets.length}
           />
         </div>
 
