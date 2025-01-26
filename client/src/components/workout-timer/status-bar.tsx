@@ -16,13 +16,11 @@ export function StatusBar({ totalTime, elapsedTime, currentPhase }: StatusBarPro
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const remainingTime = Math.max(0, totalTime - elapsedTime);
-
   return (
     <div className="w-full space-y-2">
       <div className="flex justify-between text-sm text-muted-foreground">
         <span>{Math.round(progress)}%</span>
-        <span>Time remaining: {formatTime(remainingTime)}</span>
+        <span>Total: {formatTime(totalTime)}</span>
       </div>
       <Progress 
         value={progress} 
