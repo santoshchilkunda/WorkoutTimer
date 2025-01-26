@@ -46,6 +46,7 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
 
       // Initial setup
       ytPlayer.setVolume(100);
+      ytPlayer.unMute(); // Explicitly unmute the player
       ytPlayer.playVideo();
 
       onPlayerReady(ytPlayer);
@@ -76,6 +77,8 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
         player.pauseVideo();
         setIsPlaying(false);
       } else {
+        player.unMute(); // Ensure player is unmuted when playing
+        player.setVolume(100); // Ensure volume is set
         player.playVideo();
         setIsPlaying(true);
       }
