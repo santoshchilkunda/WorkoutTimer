@@ -44,15 +44,10 @@ export function useWorkoutTimer() {
 
   // Update timeLeft when durations change or current set changes
   useEffect(() => {
-    if (!isRunning) {
-      setTimeLeft(
-        currentPhase === "workout" ? currentSet.workoutDuration :
-          currentPhase === "rest" ? currentSet.restDuration :
-            currentPhase === "countdown" ? currentSet.initialCountdown :
-              currentSet.workoutDuration
-      );
+    if (!isRunning && currentPhase === "idle") {
+      setTimeLeft(currentSet.workoutDuration);
     }
-  }, [currentSet.workoutDuration, currentSet.restDuration, currentSet.initialCountdown, currentPhase, isRunning]);
+  }, [currentSet.workoutDuration, currentPhase, isRunning]);
 
   const reset = useCallback(() => {
     setSets([{ ...DEFAULT_SET }]);
@@ -85,22 +80,17 @@ export function useWorkoutTimer() {
     ));
   }, []);
 
-  // Modified start function to handle initial start and resume
   const start = async () => {
     await audioManager.initializeAudio();
-    // Only reset state if we're starting fresh (not resuming)
-    if (currentPhase === "idle") {
-      setCurrentSetIndex(0);
-      setCurrentRound(1);
-      setCurrentPhase("countdown");
-      setTimeLeft(sets[0].initialCountdown);
-      setElapsedTime(0);
-    }
+    setCurrentSetIndex(0);
+    setCurrentRound(1);
+    setCurrentPhase("countdown");
+    setTimeLeft(sets[0].initialCountdown);
+    setElapsedTime(0);
     setIsRunning(true);
   };
 
-  const resume = async () => {
-    // Simply continue from current state
+  const resume = () => {
     setIsRunning(true);
   };
 
@@ -113,11 +103,13 @@ export function useWorkoutTimer() {
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
+        // Handle countdown beeps
         if (prev <= 3 && prev > 0) {
           void audioManager.playCountdown();
         }
 
         if (prev <= 0) {
+          // Phase transitions
           if (currentPhase === "countdown") {
             void audioManager.playPhaseChange();
             setCurrentPhase("workout");
@@ -138,7 +130,7 @@ export function useWorkoutTimer() {
                 setIsRunning(false);
                 setCurrentPhase("idle");
                 void audioManager.playComplete();
-                return currentSet.workoutDuration;
+                return 0;
               }
             } else {
               void audioManager.playPhaseChange();
@@ -157,12 +149,12 @@ export function useWorkoutTimer() {
     return () => clearInterval(interval);
   }, [isRunning, currentPhase, currentRound, currentSet, currentSetIndex, sets]);
 
-  const progress = timeLeft / (
+  const progress = Math.min(1, Math.max(0, 1 - (timeLeft / (
     currentPhase === "workout" ? currentSet.workoutDuration :
-      currentPhase === "rest" ? currentSet.restDuration :
-        currentPhase === "countdown" ? currentSet.initialCountdown :
-          currentSet.workoutDuration
-  );
+    currentPhase === "rest" ? currentSet.restDuration :
+    currentPhase === "countdown" ? currentSet.initialCountdown :
+    currentSet.workoutDuration
+  ))));
 
   return {
     sets,
