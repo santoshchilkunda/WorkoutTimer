@@ -20,9 +20,11 @@ interface CircularTimerProps {
   progress: number;
   timeLeft: number;
   phase: "workout" | "rest" | "idle";
+  currentRound?: number;
+  totalRounds?: number;
 }
 
-export function CircularTimer({ progress, timeLeft, phase }: CircularTimerProps) {
+export function CircularTimer({ progress, timeLeft, phase, currentRound, totalRounds }: CircularTimerProps) {
   const radius = 120;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress);
@@ -51,7 +53,7 @@ export function CircularTimer({ progress, timeLeft, phase }: CircularTimerProps)
           }}
         />
       </svg>
-      
+
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <div className="text-6xl font-bold tabular-nums">
           {Math.ceil(timeLeft)}
@@ -61,6 +63,11 @@ export function CircularTimer({ progress, timeLeft, phase }: CircularTimerProps)
         }`}>
           {phase === "workout" ? "WORKOUT" : phase === "rest" ? "REST" : "READY"}
         </div>
+        {phase !== "idle" && currentRound && totalRounds && (
+          <div className="text-sm text-muted-foreground mt-1">
+            Round {currentRound} of {totalRounds}
+          </div>
+        )}
       </div>
     </div>
   );
