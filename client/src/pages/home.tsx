@@ -83,6 +83,7 @@ export default function Home() {
             currentPhase={currentPhase === "countdown" ? "workout" : currentPhase}
           />
 
+          {/* Main content based on mode */}
           {mode === "setup" ? (
             // Setup mode layout
             <>
@@ -194,35 +195,6 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium">Audio Settings</h3>
-                <YouTubePlayer onPlayerReady={handleYoutubePlayerReady} />
-
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMute}
-                    className="h-8 w-8"
-                  >
-                    {isMuted ? (
-                      <VolumeX className="h-4 w-4" />
-                    ) : (
-                      <Volume2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Slider
-                    className="w-32 ml-2"
-                    value={[volume]}
-                    onValueChange={([v]) => handleVolumeChange(v)}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    disabled={isMuted}
-                  />
-                </div>
-              </div>
-
               <div className="flex justify-center gap-4">
                 <Button
                   size="lg"
@@ -263,34 +235,6 @@ export default function Home() {
                 />
               </div>
 
-              <div className="space-y-4">
-                <YouTubePlayer onPlayerReady={handleYoutubePlayerReady} />
-
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMute}
-                    className="h-8 w-8"
-                  >
-                    {isMuted ? (
-                      <VolumeX className="h-4 w-4" />
-                    ) : (
-                      <Volume2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Slider
-                    className="w-32 ml-2"
-                    value={[volume]}
-                    onValueChange={([v]) => handleVolumeChange(v)}
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    disabled={isMuted}
-                  />
-                </div>
-              </div>
-
               <div className="flex justify-center gap-4">
                 <Button
                   variant="outline"
@@ -310,6 +254,36 @@ export default function Home() {
               </div>
             </>
           )}
+
+          {/* YouTube player and audio controls - always visible */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">Audio Settings</h3>
+            <YouTubePlayer onPlayerReady={handleYoutubePlayerReady} />
+
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMute}
+                className="h-8 w-8"
+              >
+                {isMuted ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+              <Slider
+                className="w-32 ml-2"
+                value={[volume]}
+                onValueChange={([v]) => handleVolumeChange(v)}
+                min={0}
+                max={1}
+                step={0.1}
+                disabled={isMuted}
+              />
+            </div>
+          </div>
         </div>
       </Card>
     </div>
