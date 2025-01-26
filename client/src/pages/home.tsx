@@ -62,8 +62,8 @@ export default function Home() {
               progress={progress}
               timeLeft={timeLeft}
               phase={currentPhase}
-              currentRound={currentPhase !== "idle" ? currentRound : undefined}
-              totalRounds={currentPhase !== "idle" ? rounds : undefined}
+              currentRound={currentRound}
+              totalRounds={rounds}
             />
           </div>
 
