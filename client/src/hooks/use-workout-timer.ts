@@ -3,22 +3,40 @@ import { audioManager } from "@/lib/audio";
 
 type Phase = "workout" | "rest" | "idle";
 
+const INITIAL_STATE = {
+  workoutDuration: 60,
+  restDuration: 30,
+  rounds: 3
+};
+
 export function useWorkoutTimer() {
-  const [workoutDuration, setWorkoutDuration] = useState(60);
-  const [restDuration, setRestDuration] = useState(30);
-  const [rounds, setRounds] = useState(3);
+  const [workoutDuration, setWorkoutDuration] = useState(INITIAL_STATE.workoutDuration);
+  const [restDuration, setRestDuration] = useState(INITIAL_STATE.restDuration);
+  const [rounds, setRounds] = useState(INITIAL_STATE.rounds);
 
   const [currentRound, setCurrentRound] = useState(1);
   const [currentPhase, setCurrentPhase] = useState<Phase>("idle");
   const [timeLeft, setTimeLeft] = useState(workoutDuration);
   const [isRunning, setIsRunning] = useState(false);
 
+  // Update timeLeft when durations change
+  useEffect(() => {
+    if (!isRunning) {
+      setTimeLeft(currentPhase === "workout" ? workoutDuration : 
+                 currentPhase === "rest" ? restDuration : 
+                 workoutDuration);
+    }
+  }, [workoutDuration, restDuration, currentPhase, isRunning]);
+
   const reset = useCallback(() => {
+    setWorkoutDuration(INITIAL_STATE.workoutDuration);
+    setRestDuration(INITIAL_STATE.restDuration);
+    setRounds(INITIAL_STATE.rounds);
     setCurrentRound(1);
     setCurrentPhase("idle");
-    setTimeLeft(workoutDuration);
+    setTimeLeft(INITIAL_STATE.workoutDuration);
     setIsRunning(false);
-  }, [workoutDuration]);
+  }, []);
 
   const start = () => setIsRunning(true);
   const pause = () => setIsRunning(false);
@@ -28,7 +46,6 @@ export function useWorkoutTimer() {
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        // Changed from 4 to 3 for countdown sound
         if (prev <= 3 && prev > 0) {
           audioManager.playCountdown();
         }
