@@ -29,6 +29,8 @@ export function CircularTimer({ progress, timeLeft, phase, currentRound, totalRo
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - progress);
 
+  const showRounds = phase !== "idle" && currentRound !== undefined && totalRounds !== undefined;
+
   return (
     <div className="relative w-72 h-72">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 300 300">
@@ -63,7 +65,7 @@ export function CircularTimer({ progress, timeLeft, phase, currentRound, totalRo
         }`}>
           {phase === "workout" ? "WORKOUT" : phase === "rest" ? "REST" : "READY"}
         </div>
-        {phase !== "idle" && currentRound && totalRounds && (
+        {showRounds && (
           <div className="text-sm text-muted-foreground mt-1">
             Round: {currentRound} / {totalRounds}
           </div>
