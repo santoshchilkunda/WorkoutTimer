@@ -8,7 +8,7 @@ interface WorkoutSet {
   restDuration: number;
   rounds: number;
   initialCountdown: number;
-  details: string;  // Added details field
+  details: string;
 }
 
 const DEFAULT_SET: WorkoutSet = {
@@ -16,7 +16,7 @@ const DEFAULT_SET: WorkoutSet = {
   restDuration: 30,
   rounds: 3,
   initialCountdown: 15,
-  details: ""  // Default empty details
+  details: ""
 };
 
 export function useWorkoutTimer() {
@@ -85,9 +85,11 @@ export function useWorkoutTimer() {
     ));
   }, []);
 
-  const start = async (shouldReset: boolean = true) => {
+  // Modified start function to handle initial start and resume
+  const start = async () => {
     await audioManager.initializeAudio();
-    if (shouldReset) {
+    // Only reset state if we're starting fresh (not resuming)
+    if (currentPhase === "idle") {
       setCurrentSetIndex(0);
       setCurrentRound(1);
       setCurrentPhase("countdown");
@@ -98,10 +100,13 @@ export function useWorkoutTimer() {
   };
 
   const resume = async () => {
-    await start(false);
+    // Simply continue from current state
+    setIsRunning(true);
   };
 
-  const pause = () => setIsRunning(false);
+  const pause = () => {
+    setIsRunning(false);
+  };
 
   useEffect(() => {
     if (!isRunning) return;
