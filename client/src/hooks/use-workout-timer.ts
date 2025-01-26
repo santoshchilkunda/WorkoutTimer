@@ -19,6 +19,11 @@ export function useWorkoutTimer() {
   const [timeLeft, setTimeLeft] = useState(workoutDuration);
   const [isRunning, setIsRunning] = useState(false);
 
+  // Initialize audio when component mounts
+  useEffect(() => {
+    audioManager.initializeAudio();
+  }, []);
+
   // Update timeLeft when durations change
   useEffect(() => {
     if (!isRunning) {
@@ -39,8 +44,9 @@ export function useWorkoutTimer() {
   }, []);
 
   const start = async () => {
-    // Initialize audio when user starts the timer
+    // Ensure audio is initialized and resume if needed
     await audioManager.initializeAudio();
+    setCurrentPhase("workout");
     setIsRunning(true);
   };
 
@@ -51,8 +57,9 @@ export function useWorkoutTimer() {
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
+        // Play countdown beep for last 3 seconds of any phase
         if (prev <= 3 && prev > 0) {
-          audioManager.playCountdown();
+          void audioManager.playCountdown();
         }
 
         if (prev <= 0) {
@@ -60,14 +67,14 @@ export function useWorkoutTimer() {
             if (currentRound >= rounds) {
               setIsRunning(false);
               setCurrentPhase("idle");
-              audioManager.playComplete();
+              void audioManager.playComplete();
               return workoutDuration;
             }
-            audioManager.playPhaseChange();
+            void audioManager.playPhaseChange();
             setCurrentPhase("rest");
             return restDuration;
           } else {
-            audioManager.playPhaseChange();
+            void audioManager.playPhaseChange();
             setCurrentPhase("workout");
             setCurrentRound((r) => r + 1);
             return workoutDuration;
