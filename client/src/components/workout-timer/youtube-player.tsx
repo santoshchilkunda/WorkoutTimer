@@ -37,9 +37,9 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
 
   // Helper function to extract video ID from YouTube URL
   function extractVideoId(url: string) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    return (match && match[7].length === 11) ? match[7] : null;
   }
 
   useEffect(() => {
@@ -72,18 +72,21 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
 
   const handleReady = (event: any) => {
     try {
-      console.log('YouTube Player Ready');
       const ytPlayer = event.target;
       setPlayer(ytPlayer);
 
-      // Initial setup
-      ytPlayer.setVolume(100);
+      // Ensure player is unmuted and volume is at max
       ytPlayer.unMute();
-      ytPlayer.playVideo();
+      ytPlayer.setVolume(100);
 
+      // Start playing
+      ytPlayer.playVideo();
       onPlayerReady(ytPlayer);
       setLoading(false);
       setIsPlaying(true);
+
+      // Log player state for debugging
+      console.log('YouTube Player State:', ytPlayer.getPlayerState());
     } catch (error) {
       console.error('YouTube player initialization error:', error);
       handleError();
@@ -101,18 +104,22 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
     setIsPlaying(false);
   };
 
+  const handleStateChange = (event: any) => {
+    // Update playing state based on player state
+    const playerState = event.data;
+    setIsPlaying(playerState === 1); // 1 is playing state
+  };
+
   const togglePlayPause = () => {
     if (!player) return;
 
     try {
       if (isPlaying) {
         player.pauseVideo();
-        setIsPlaying(false);
       } else {
         player.unMute();
         player.setVolume(100);
         player.playVideo();
-        setIsPlaying(true);
       }
     } catch (error) {
       console.error('YouTube player control error:', error);
@@ -151,6 +158,8 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
           <YouTube
             videoId={videoId}
             opts={{
+              height: '200',
+              width: '100%',
               playerVars: {
                 autoplay: 1,
                 controls: 0,
@@ -162,6 +171,7 @@ export const YouTubePlayer = forwardRef<YouTubePlayerRef, YouTubePlayerProps>(({
               },
             }}
             onReady={handleReady}
+            onStateChange={handleStateChange}
             onError={handleError}
             className="w-full"
           />
