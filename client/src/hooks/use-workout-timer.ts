@@ -38,7 +38,6 @@ export function useWorkoutTimer() {
   // Calculate total workout time for all sets
   const totalTime = useMemo(() => {
     return sets.reduce((total, set) => {
-      // Only include workout and rest durations multiplied by rounds
       return total + (set.workoutDuration + set.restDuration) * set.rounds;
     }, 0);
   }, [sets]);
@@ -86,14 +85,20 @@ export function useWorkoutTimer() {
     ));
   }, []);
 
-  const start = async () => {
+  const start = async (shouldReset: boolean = true) => {
     await audioManager.initializeAudio();
-    setCurrentSetIndex(0);
-    setCurrentRound(1);
-    setCurrentPhase("countdown");
-    setTimeLeft(sets[0].initialCountdown);
-    setElapsedTime(0);
+    if (shouldReset) {
+      setCurrentSetIndex(0);
+      setCurrentRound(1);
+      setCurrentPhase("countdown");
+      setTimeLeft(sets[0].initialCountdown);
+      setElapsedTime(0);
+    }
     setIsRunning(true);
+  };
+
+  const resume = async () => {
+    await start(false);
   };
 
   const pause = () => setIsRunning(false);
@@ -170,6 +175,7 @@ export function useWorkoutTimer() {
     removeSet,
     updateSet,
     start,
+    resume,
     pause,
     reset
   };

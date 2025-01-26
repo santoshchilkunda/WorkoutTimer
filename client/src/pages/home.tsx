@@ -32,6 +32,7 @@ export default function Home() {
     updateSet,
     start,
     pause,
+    resume,
     reset
   } = useWorkoutTimer();
 
@@ -238,61 +239,67 @@ export default function Home() {
                   currentSet={currentSetIndex + 1}
                   totalSets={sets.length}
                   className="mt-4 md:mt-0"
-                />
-              </div>
+                >
+                  <div className="flex justify-center gap-4 mt-4">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={handleBack}
+                      className="w-32"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                    </Button>
+                    <Button
+                      size="lg"
+                      onClick={isRunning ? pause : resume}
+                      className="w-32"
+                    >
+                      {isRunning ? (
+                        <>
+                          <Pause className="mr-2 h-4 w-4" /> Pause
+                        </>
+                      ) : (
+                        <>
+                          <Play className="mr-2 h-4 w-4" /> Resume
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <div className="space-y-4 mt-4">
+                    <h3 className="text-sm font-medium">Audio Settings</h3>
+                    <YouTubePlayer
+                      ref={youtubePlayerRef}
+                      onPlayerReady={handleYoutubePlayerReady}
+                    />
 
-              <div className="flex justify-center gap-4">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleBack}
-                  className="w-32"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={pause}
-                  className="w-32"
-                >
-                  <Pause className="mr-2 h-4 w-4" /> Pause
-                </Button>
+                    <div className="flex items-center justify-between">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleMute}
+                        className="h-8 w-8"
+                      >
+                        {isMuted ? (
+                          <VolumeX className="h-4 w-4" />
+                        ) : (
+                          <Volume2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <Slider
+                        className="w-32 ml-2"
+                        value={[volume]}
+                        onValueChange={([v]) => handleVolumeChange(v)}
+                        min={0}
+                        max={1}
+                        step={0.1}
+                        disabled={isMuted}
+                      />
+                    </div>
+                  </div>
+                </WorkoutDetails>
               </div>
             </>
           )}
-
-          {/* YouTube player and audio controls - always visible */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium">Audio Settings</h3>
-            <YouTubePlayer 
-              ref={youtubePlayerRef}
-              onPlayerReady={handleYoutubePlayerReady} 
-            />
-
-            <div className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMute}
-                className="h-8 w-8"
-              >
-                {isMuted ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
-              <Slider
-                className="w-32 ml-2"
-                value={[volume]}
-                onValueChange={([v]) => handleVolumeChange(v)}
-                min={0}
-                max={1}
-                step={0.1}
-                disabled={isMuted}
-              />
-            </div>
-          </div>
         </div>
       </Card>
     </div>
