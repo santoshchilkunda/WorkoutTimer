@@ -6,7 +6,7 @@ import { StatusBar } from "@/components/workout-timer/status-bar";
 import { WorkoutDetails } from "@/components/workout-timer/workout-details";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Volume2, VolumeX, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Plus, Trash2, ArrowLeft, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { audioManager } from "@/lib/audio";
 import { Slider } from "@/components/ui/slider";
@@ -223,13 +223,21 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-4">
                 <Button
                   size="lg"
                   onClick={handleStart}
                   className="w-32"
                 >
                   <Play className="mr-2 h-4 w-4" /> Start
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={reset}
+                  className="w-32"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" /> Reset
                 </Button>
               </div>
             </>
