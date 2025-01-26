@@ -79,6 +79,8 @@ export function useWorkoutTimer() {
     setCurrentSetIndex(0);
     setCurrentRound(1);
     setCurrentPhase("workout");
+    // Set the initial time to the first set's workout duration
+    setTimeLeft(sets[0].workoutDuration);
     setIsRunning(true);
   };
 
