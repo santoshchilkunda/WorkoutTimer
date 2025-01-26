@@ -3,7 +3,10 @@ import { CircularTimer } from "@/components/workout-timer/circular-timer";
 import { ControlKnob } from "@/components/workout-timer/control-knob";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RotateCcw } from "lucide-react";
+import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react";
+import { useState } from "react";
+import { audioManager } from "@/lib/audio";
+import { Slider } from "@/components/ui/slider";
 
 export default function Home() {
   const {
@@ -21,6 +24,19 @@ export default function Home() {
     pause,
     reset
   } = useWorkoutTimer();
+
+  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(0.3);
+
+  const handleVolumeChange = (newVolume: number) => {
+    setVolume(newVolume);
+    audioManager.setVolume(newVolume);
+  };
+
+  const toggleMute = () => {
+    audioManager.toggleMute();
+    setIsMuted(!isMuted);
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-background to-accent p-4 flex items-center justify-center">
@@ -72,6 +88,32 @@ export default function Home() {
                 step={1}
                 unit="rounds"
               />
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleMute}
+                    className="h-8 w-8"
+                  >
+                    {isMuted ? (
+                      <VolumeX className="h-4 w-4" />
+                    ) : (
+                      <Volume2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Slider
+                    className="w-32 ml-2"
+                    value={[volume]}
+                    onValueChange={([v]) => handleVolumeChange(v)}
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    disabled={isMuted}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-center gap-4">

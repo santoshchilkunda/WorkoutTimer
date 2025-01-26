@@ -7,7 +7,7 @@ export function useWorkoutTimer() {
   const [workoutDuration, setWorkoutDuration] = useState(60);
   const [restDuration, setRestDuration] = useState(30);
   const [rounds, setRounds] = useState(3);
-  
+
   const [currentRound, setCurrentRound] = useState(1);
   const [currentPhase, setCurrentPhase] = useState<Phase>("idle");
   const [timeLeft, setTimeLeft] = useState(workoutDuration);
@@ -31,12 +31,13 @@ export function useWorkoutTimer() {
         if (prev <= 4 && prev > 0) {
           audioManager.playCountdown();
         }
-        
+
         if (prev <= 0) {
           if (currentPhase === "workout") {
             if (currentRound >= rounds) {
               setIsRunning(false);
               setCurrentPhase("idle");
+              audioManager.playComplete(); // Play completion sound
               return workoutDuration;
             }
             audioManager.playPhaseChange();
