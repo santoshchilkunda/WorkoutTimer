@@ -129,7 +129,7 @@ export default function Home() {
                       value={set.initialCountdown}
                       onChange={(value) => updateSet(index, { initialCountdown: value })}
                       min={0}
-                      max={30}
+                      max={180}
                       step={5}
                       unit="sec"
                     />
@@ -138,7 +138,7 @@ export default function Home() {
                       value={set.workoutDuration}
                       onChange={(value) => updateSet(index, { workoutDuration: value })}
                       min={10}
-                      max={300}
+                      max={180}
                       step={5}
                       unit="sec"
                     />
@@ -147,7 +147,7 @@ export default function Home() {
                       value={set.restDuration}
                       onChange={(value) => updateSet(index, { restDuration: value })}
                       min={5}
-                      max={120}
+                      max={180}
                       step={5}
                       unit="sec"
                     />
