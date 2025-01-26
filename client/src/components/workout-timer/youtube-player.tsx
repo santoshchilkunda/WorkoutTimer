@@ -2,10 +2,16 @@ import { useState } from "react";
 import YouTube from "react-youtube";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import parse from "youtube-url-parser";
 
 interface YouTubePlayerProps {
   onPlayerReady: (player: any) => void;
+}
+
+// Helper function to extract video ID from YouTube URL
+function extractVideoId(url: string) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
 }
 
 export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
@@ -14,9 +20,11 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = parse(url);
-    if (parsed && typeof parsed === "string") {
-      setVideoId(parsed);
+    const extracted = extractVideoId(url);
+    if (extracted) {
+      setVideoId(extracted);
+    } else {
+      console.error("Invalid YouTube URL");
     }
   };
 
