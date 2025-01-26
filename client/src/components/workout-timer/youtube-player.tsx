@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import YouTube from "react-youtube";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,19 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [player, setPlayer] = useState<any>(null);
 
+  useEffect(() => {
+    // Cleanup function
+    return () => {
+      if (player) {
+        try {
+          player.stopVideo();
+        } catch (error) {
+          console.error('Error stopping video:', error);
+        }
+      }
+    };
+  }, [player]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const extracted = extractVideoId(url);
@@ -40,13 +53,13 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
 
   const handleReady = (event: any) => {
     try {
-      // Store player reference first
+      console.log('YouTube Player Ready');
       const ytPlayer = event.target;
       setPlayer(ytPlayer);
 
       // Initial setup
       ytPlayer.setVolume(100);
-      ytPlayer.unMute(); // Explicitly unmute the player
+      ytPlayer.unMute();
       ytPlayer.playVideo();
 
       onPlayerReady(ytPlayer);
@@ -77,8 +90,8 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
         player.pauseVideo();
         setIsPlaying(false);
       } else {
-        player.unMute(); // Ensure player is unmuted when playing
-        player.setVolume(100); // Ensure volume is set
+        player.unMute();
+        player.setVolume(100);
         player.playVideo();
         setIsPlaying(true);
       }
@@ -115,7 +128,7 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
       </form>
 
       {videoId && (
-        <div aria-hidden className="hidden">
+        <div className="relative">
           <YouTube
             videoId={videoId}
             opts={{
@@ -125,11 +138,13 @@ export function YouTubePlayer({ onPlayerReady }: YouTubePlayerProps) {
                 disablekb: 1,
                 fs: 0,
                 modestbranding: 1,
-                playsinline: 1
+                playsinline: 1,
+                origin: window.location.origin
               },
             }}
             onReady={handleReady}
             onError={handleError}
+            className="w-full"
           />
         </div>
       )}
