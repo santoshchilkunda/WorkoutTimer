@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { audioManager } from "@/lib/audio";
 
 type Phase = "workout" | "rest" | "idle";
@@ -22,6 +22,7 @@ export function useWorkoutTimer() {
   const [currentPhase, setCurrentPhase] = useState<Phase>("idle");
   const [timeLeft, setTimeLeft] = useState(sets[0].workoutDuration);
   const [isRunning, setIsRunning] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   // Initialize audio when component mounts
   useEffect(() => {
@@ -29,6 +30,13 @@ export function useWorkoutTimer() {
   }, []);
 
   const currentSet = sets[currentSetIndex];
+
+  // Calculate total workout time for all sets
+  const totalTime = useMemo(() => {
+    return sets.reduce((total, set) => {
+      return total + (set.workoutDuration + set.restDuration) * set.rounds;
+    }, 0);
+  }, [sets]);
 
   // Update timeLeft when durations change or current set changes
   useEffect(() => {
@@ -48,6 +56,7 @@ export function useWorkoutTimer() {
     setCurrentPhase("idle");
     setTimeLeft(DEFAULT_SET.workoutDuration);
     setIsRunning(false);
+    setElapsedTime(0);
   }, []);
 
   const addSet = useCallback(() => {
@@ -81,6 +90,7 @@ export function useWorkoutTimer() {
     setCurrentPhase("workout");
     // Set the initial time to the first set's workout duration
     setTimeLeft(sets[0].workoutDuration);
+    setElapsedTime(0);
     setIsRunning(true);
   };
 
@@ -127,6 +137,9 @@ export function useWorkoutTimer() {
         }
         return prev - 0.1;
       });
+
+      // Update elapsed time
+      setElapsedTime(prev => prev + 0.1);
     }, 100);
 
     return () => clearInterval(interval);
@@ -145,6 +158,8 @@ export function useWorkoutTimer() {
     timeLeft,
     isRunning,
     progress,
+    totalTime,
+    elapsedTime,
     addSet,
     removeSet,
     updateSet,

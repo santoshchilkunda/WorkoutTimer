@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { CircularTimer } from "@/components/workout-timer/circular-timer";
 import { ControlKnob } from "@/components/workout-timer/control-knob";
 import { YouTubePlayer } from "@/components/workout-timer/youtube-player";
+import { StatusBar } from "@/components/workout-timer/status-bar";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Plus, Trash2 } from "lucide-react";
@@ -21,6 +22,8 @@ export default function Home() {
     timeLeft,
     progress,
     currentRound,
+    totalTime,
+    elapsedTime,
     addSet,
     removeSet,
     updateSet,
@@ -59,7 +62,7 @@ export default function Home() {
         </div>
 
         <div className="space-y-8">
-          <div className="flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
             <CircularTimer
               progress={progress}
               timeLeft={timeLeft}
@@ -69,6 +72,13 @@ export default function Home() {
               currentSet={currentSetIndex + 1}
               totalSets={sets.length}
             />
+            <div className="w-full max-w-sm">
+              <StatusBar
+                totalTime={totalTime}
+                elapsedTime={elapsedTime}
+                currentPhase={currentPhase}
+              />
+            </div>
           </div>
 
           <div className="space-y-6">
