@@ -31,8 +31,8 @@ export default function Home() {
     removeSet,
     updateSet,
     start,
-    pause,
     resume,
+    pause,
     reset
   } = useWorkoutTimer();
 
@@ -232,15 +232,8 @@ export default function Home() {
                     currentRound={currentRound}
                     totalRounds={currentSet.rounds}
                   />
-                </div>
 
-                <WorkoutDetails
-                  details={currentSet.details || ""}
-                  currentSet={currentSetIndex + 1}
-                  totalSets={sets.length}
-                  className="mt-4 md:mt-0"
-                >
-                  <div className="flex justify-center gap-4 mt-4">
+                  <div className="flex justify-center gap-4 mt-8">
                     <Button
                       variant="outline"
                       size="lg"
@@ -265,6 +258,14 @@ export default function Home() {
                       )}
                     </Button>
                   </div>
+                </div>
+
+                <WorkoutDetails
+                  details={currentSet.details || ""}
+                  currentSet={currentSetIndex + 1}
+                  totalSets={sets.length}
+                  className="mt-4 md:mt-0"
+                >
                   <div className="space-y-4 mt-4">
                     <h3 className="text-sm font-medium">Audio Settings</h3>
                     <YouTubePlayer
