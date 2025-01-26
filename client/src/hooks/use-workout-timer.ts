@@ -8,13 +8,15 @@ interface WorkoutSet {
   restDuration: number;
   rounds: number;
   initialCountdown: number;
+  details: string;  // Added details field
 }
 
 const DEFAULT_SET: WorkoutSet = {
   workoutDuration: 60,
   restDuration: 30,
   rounds: 3,
-  initialCountdown: 15
+  initialCountdown: 15,
+  details: ""  // Default empty details
 };
 
 export function useWorkoutTimer() {

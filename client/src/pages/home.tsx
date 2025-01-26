@@ -3,6 +3,7 @@ import { CircularTimer } from "@/components/workout-timer/circular-timer";
 import { ControlKnob } from "@/components/workout-timer/control-knob";
 import { YouTubePlayer } from "@/components/workout-timer/youtube-player";
 import { StatusBar } from "@/components/workout-timer/status-bar";
+import { WorkoutDetails } from "@/components/workout-timer/workout-details";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw, Volume2, VolumeX, Plus, Trash2 } from "lucide-react";
@@ -10,6 +11,8 @@ import { useState } from "react";
 import { audioManager } from "@/lib/audio";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 export default function Home() {
   const {
@@ -51,7 +54,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-background to-accent p-4 flex items-center justify-center">
-      <Card className="w-full max-w-3xl p-6 shadow-xl bg-background/95 backdrop-blur">
+      <Card className="w-full max-w-5xl p-6 shadow-xl bg-background/95 backdrop-blur">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             Workout Timer
@@ -62,29 +65,38 @@ export default function Home() {
         </div>
 
         <div className="space-y-8">
-          <div className="flex flex-col items-center justify-center space-y-4">
-            <CircularTimer
-              progress={progress}
-              timeLeft={timeLeft}
-              phase={currentPhase}
-              currentRound={currentRound}
-              totalRounds={currentSet.rounds}
-              currentSet={currentSetIndex + 1}
-              totalSets={sets.length}
-            />
-            <div className="w-full max-w-sm">
-              <StatusBar
-                totalTime={totalTime}
-                elapsedTime={elapsedTime}
-                currentPhase={currentPhase}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <CircularTimer
+                progress={progress}
+                timeLeft={timeLeft}
+                phase={currentPhase}
+                currentRound={currentRound}
+                totalRounds={currentSet.rounds}
+                currentSet={currentSetIndex + 1}
+                totalSets={sets.length}
               />
+              <div className="w-full max-w-sm">
+                <StatusBar
+                  totalTime={totalTime}
+                  elapsedTime={elapsedTime}
+                  currentPhase={currentPhase}
+                />
+              </div>
             </div>
+
+            {isRunning && (
+              <WorkoutDetails
+                details={currentSet.details || ""} // Handle undefined details
+                className="mt-4 md:mt-0"
+              />
+            )}
           </div>
 
           <div className="space-y-6">
             <Tabs
               value={currentSetIndex.toString()}
-              onValueChange={(value) => setCurrentSetIndex(parseInt(value))}
+              onValueChange={(value) => setCurrentSetIndex(parseInt(value, 10))} //Added radix for parseInt
               className="w-full"
             >
               <div className="flex items-center justify-between mb-4">
@@ -160,6 +172,17 @@ export default function Home() {
                       step={1}
                       unit="rounds"
                     />
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Workout Details</Label>
+                      <Textarea
+                        value={set.details || ""} // Handle undefined details
+                        onChange={(e) => updateSet(index, { details: e.target.value })}
+                        placeholder="Enter workout details, instructions, or notes..."
+                        className="h-[100px]"
+                        disabled={isRunning}
+                      />
+                    </div>
                   </div>
                 </TabsContent>
               ))}
