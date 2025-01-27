@@ -93,6 +93,7 @@ export default function Home() {
   const handleBack = () => {
     pause();
     setMode("setup");
+    // Don't reset the state when going back
   };
 
   const handleReset = () => {
@@ -361,16 +362,29 @@ export default function Home() {
               <p className="text-lg text-muted-foreground">
                 Great job! You've completed your workout session.
               </p>
-              <Button
-                onClick={() => {
-                  setShowCompletionDialog(false);
-                  handleReset();
-                }}
-                className="w-full"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Start New Workout
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    setShowCompletionDialog(false);
+                    handleBack(); // Use handleBack instead of handleReset to preserve state
+                  }}
+                  className="flex-1"
+                  variant="outline"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Setup
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowCompletionDialog(false);
+                    handleReset();
+                  }}
+                  className="flex-1"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  New Workout
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
