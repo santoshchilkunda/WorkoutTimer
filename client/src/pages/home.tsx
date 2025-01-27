@@ -220,29 +220,32 @@ export default function Home() {
           ) : (
             // Workout mode layout
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
                 <div className="flex flex-col items-center justify-center">
-                  <CircularTimer
-                    progress={progress}
-                    timeLeft={timeLeft}
-                    phase={currentPhase}
-                    currentRound={currentRound}
-                    totalRounds={currentSet.rounds}
-                  />
+                  {/* Make timer slightly smaller on mobile */}
+                  <div className="transform scale-90 sm:scale-100">
+                    <CircularTimer
+                      progress={progress}
+                      timeLeft={timeLeft}
+                      phase={currentPhase}
+                      currentRound={currentRound}
+                      totalRounds={currentSet.rounds}
+                    />
+                  </div>
 
-                  <div className="flex justify-center gap-4 mt-8">
+                  <div className="flex justify-center gap-4 mt-6 lg:mt-8">
                     <Button
                       variant="outline"
                       size="lg"
                       onClick={handleBack}
-                      className="w-32"
+                      className="w-28 lg:w-32"
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" /> Back
                     </Button>
                     <Button
                       size="lg"
                       onClick={isRunning ? pause : resume}
-                      className="w-32"
+                      className="w-28 lg:w-32"
                     >
                       {isRunning ? (
                         <>
@@ -261,62 +264,64 @@ export default function Home() {
                   details={currentSet.details || ""}
                   currentSet={currentSetIndex + 1}
                   totalSets={sets.length}
-                  className="mt-4 md:mt-0"
+                  className="mt-4 lg:mt-0"
                 >
                   <div className="space-y-4 mt-4">
                     <h3 className="text-sm font-medium">Audio Settings</h3>
-                    <YouTubePlayer
-                      ref={youtubePlayerRef}
-                      onPlayerReady={handleYoutubePlayerReady}
-                    />
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <YouTubePlayer
+                        ref={youtubePlayerRef}
+                        onPlayerReady={handleYoutubePlayerReady}
+                      />
 
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={toggleMute}
-                          className="h-8 w-8"
-                        >
-                          {isMuted ? (
-                            <VolumeX className="h-4 w-4" />
-                          ) : (
-                            <Volume2 className="h-4 w-4" />
-                          )}
-                        </Button>
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Notification Volume</span>
-                            <span className="text-muted-foreground">{Math.round(notificationVolume * 100)}%</span>
+                      <div className="space-y-4 mt-4">
+                        <div className="flex items-center gap-4">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={toggleMute}
+                            className="h-8 w-8 shrink-0"
+                          >
+                            {isMuted ? (
+                              <VolumeX className="h-4 w-4" />
+                            ) : (
+                              <Volume2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Notification Volume</span>
+                              <span className="text-muted-foreground">{Math.round(notificationVolume * 100)}%</span>
+                            </div>
+                            <Slider
+                              value={[notificationVolume]}
+                              onValueChange={([v]) => handleNotificationVolumeChange(v)}
+                              min={0}
+                              max={1}
+                              step={0.1}
+                              disabled={isMuted}
+                            />
                           </div>
-                          <Slider
-                            value={[notificationVolume]}
-                            onValueChange={([v]) => handleNotificationVolumeChange(v)}
-                            min={0}
-                            max={1}
-                            step={0.1}
-                            disabled={isMuted}
-                          />
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 flex items-center justify-center">
-                          <i className="text-muted-foreground">♫</i>
-                        </div>
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">YouTube Volume</span>
-                            <span className="text-muted-foreground">{Math.round(youtubeVolume * 100)}%</span>
+                        <div className="flex items-center gap-4">
+                          <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                            <i className="text-muted-foreground">♫</i>
                           </div>
-                          <Slider
-                            value={[youtubeVolume]}
-                            onValueChange={([v]) => handleYoutubeVolumeChange(v)}
-                            min={0}
-                            max={1}
-                            step={0.1}
-                            disabled={isMuted}
-                          />
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">YouTube Volume</span>
+                              <span className="text-muted-foreground">{Math.round(youtubeVolume * 100)}%</span>
+                            </div>
+                            <Slider
+                              value={[youtubeVolume]}
+                              onValueChange={([v]) => handleYoutubeVolumeChange(v)}
+                              min={0}
+                              max={1}
+                              step={0.1}
+                              disabled={isMuted}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
