@@ -6,14 +6,15 @@ import { StatusBar } from "@/components/workout-timer/status-bar";
 import { WorkoutDetails } from "@/components/workout-timer/workout-details";
 import { useWorkoutTimer } from "@/hooks/use-workout-timer";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Volume2, VolumeX, Plus, Trash2, ArrowLeft, RotateCcw } from "lucide-react";
-import { useState, useRef } from "react";
+import { Play, Pause, Volume2, VolumeX, Plus, Trash2, ArrowLeft, RotateCcw, Trophy } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { audioManager } from "@/lib/audio";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Home() {
   const {
@@ -43,6 +44,13 @@ export default function Home() {
   const [mode, setMode] = useState<"setup" | "workout">("setup");
   const youtubePlayerRef = useRef<YouTubePlayerRef>(null);
   const { toast } = useToast();
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+
+  useEffect(() => {
+    if (currentPhase === "idle" && elapsedTime > 0) {
+      setShowCompletionDialog(true);
+    }
+  }, [currentPhase, elapsedTime]);
 
   const handleNotificationVolumeChange = (newVolume: number) => {
     setNotificationVolume(newVolume);
@@ -66,21 +74,17 @@ export default function Home() {
 
   const handleStart = async () => {
     try {
-      // Initialize audio system first
       await audioManager.initializeAudio();
       console.log('Audio initialized before starting workout');
-
       setMode("workout");
       await start();
     } catch (error) {
       console.error('Error starting workout:', error);
-      // Show error toast
       toast({
         variant: "destructive",
         title: "Audio System Error",
         description: error instanceof Error ? error.message : "Unable to initialize audio. Timer will work without sound notifications.",
       });
-      // Continue with workout even if audio fails
       setMode("workout");
       await start();
     }
@@ -109,16 +113,13 @@ export default function Home() {
         </div>
 
         <div className="space-y-8">
-          {/* Status bar always visible */}
           <StatusBar
             totalTime={totalTime}
             elapsedTime={elapsedTime}
             currentPhase={currentPhase === "countdown" ? "workout" : currentPhase}
           />
 
-          {/* Main content based on mode */}
           {mode === "setup" ? (
-            // Setup mode layout
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
@@ -237,11 +238,9 @@ export default function Home() {
               </div>
             </>
           ) : (
-            // Workout mode layout
             <>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
                 <div className="flex flex-col items-center justify-center">
-                  {/* Make timer slightly smaller on mobile */}
                   <div className="transform scale-90 sm:scale-100">
                     <CircularTimer
                       progress={progress}
@@ -350,6 +349,31 @@ export default function Home() {
             </>
           )}
         </div>
+        <Dialog open={showCompletionDialog} onOpenChange={setShowCompletionDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-500" />
+                Workout Complete!
+              </DialogTitle>
+            </DialogHeader>
+            <div className="text-center space-y-4 py-4">
+              <p className="text-lg text-muted-foreground">
+                Great job! You've completed your workout session.
+              </p>
+              <Button
+                onClick={() => {
+                  setShowCompletionDialog(false);
+                  handleReset();
+                }}
+                className="w-full"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Start New Workout
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </Card>
     </div>
   );
