@@ -3,6 +3,7 @@ class AudioManager {
   private gainNode: GainNode | null = null;
   private youtubePlayer: any = null;
   private muted: boolean = false;
+  private isInitialized: boolean = false;
 
   setYoutubePlayer(player: any) {
     this.youtubePlayer = player;
@@ -38,39 +39,49 @@ class AudioManager {
   }
 
   async initializeAudio() {
-    if (!this.audioContext) {
-      try {
-        this.audioContext = new AudioContext();
-        this.gainNode = this.audioContext.createGain();
-        this.gainNode.connect(this.audioContext.destination);
-        this.setVolume(0.3);
-      } catch (error) {
-        console.error('Failed to initialize audio context:', error);
-      }
+    if (this.isInitialized) return;
+
+    try {
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.gainNode = this.audioContext.createGain();
+      this.gainNode.connect(this.audioContext.destination);
+      this.setVolume(0.3);
+      this.isInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize audio context:', error);
+      // Don't throw error - allow app to work without sound if audio is not supported
     }
 
     if (this.audioContext?.state === 'suspended') {
-      await this.audioContext.resume();
+      try {
+        await this.audioContext.resume();
+      } catch (error) {
+        console.error('Failed to resume audio context:', error);
+      }
     }
   }
 
   async playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
-    if (!this.audioContext || !this.gainNode || this.muted) return;
+    if (!this.audioContext || !this.gainNode || this.muted || !this.isInitialized) return;
 
-    const oscillator = this.audioContext.createOscillator();
-    const toneGain = this.audioContext.createGain();
+    try {
+      const oscillator = this.audioContext.createOscillator();
+      const toneGain = this.audioContext.createGain();
 
-    // Keep notification sounds at a low, fixed volume
-    toneGain.gain.value = 0.2;
+      // Keep notification sounds at a low, fixed volume
+      toneGain.gain.value = 0.2;
 
-    oscillator.connect(toneGain);
-    toneGain.connect(this.gainNode);
+      oscillator.connect(toneGain);
+      toneGain.connect(this.gainNode);
 
-    oscillator.frequency.value = frequency;
-    oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
 
-    oscillator.start();
-    oscillator.stop(this.audioContext.currentTime + duration);
+      oscillator.start();
+      oscillator.stop(this.audioContext.currentTime + duration);
+    } catch (error) {
+      console.error('Failed to play tone:', error);
+    }
   }
 
   async playPhaseChange() {

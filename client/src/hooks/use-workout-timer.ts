@@ -28,11 +28,6 @@ export function useWorkoutTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Initialize audio when component mounts
-  useEffect(() => {
-    audioManager.initializeAudio();
-  }, []);
-
   const currentSet = sets[currentSetIndex];
 
   // Calculate total workout time for all sets
@@ -82,13 +77,25 @@ export function useWorkoutTimer() {
   }, []);
 
   const start = async () => {
-    await audioManager.initializeAudio();
-    setCurrentSetIndex(0);
-    setCurrentRound(1);
-    setCurrentPhase("countdown");
-    setTimeLeft(sets[0].initialCountdown);
-    setElapsedTime(0);
-    setIsRunning(true);
+    try {
+      // Initialize audio when user starts the workout (user interaction)
+      await audioManager.initializeAudio();
+      setCurrentSetIndex(0);
+      setCurrentRound(1);
+      setCurrentPhase("countdown");
+      setTimeLeft(sets[0].initialCountdown);
+      setElapsedTime(0);
+      setIsRunning(true);
+    } catch (error) {
+      console.error('Failed to start workout:', error);
+      // Continue without audio if initialization fails
+      setCurrentSetIndex(0);
+      setCurrentRound(1);
+      setCurrentPhase("countdown");
+      setTimeLeft(sets[0].initialCountdown);
+      setElapsedTime(0);
+      setIsRunning(true);
+    }
   };
 
   const resume = () => {
