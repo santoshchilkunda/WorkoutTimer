@@ -4,6 +4,7 @@ class AudioManager {
   private youtubePlayer: any = null;
   private muted: boolean = false;
   private isInitialized: boolean = false;
+  private hasUserInteraction: boolean = false;
 
   setYoutubePlayer(player: any) {
     this.youtubePlayer = player;
@@ -38,33 +39,74 @@ class AudioManager {
     this.setVolume(this.gainNode?.gain.value || 0.3);
   }
 
-  async initializeAudio() {
-    if (this.isInitialized) return;
-
-    try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      this.gainNode = this.audioContext.createGain();
-      this.gainNode.connect(this.audioContext.destination);
-      this.setVolume(0.3);
-      this.isInitialized = true;
-    } catch (error) {
-      console.error('Failed to initialize audio context:', error);
-      // Don't throw error - allow app to work without sound if audio is not supported
-    }
-
+  private async resumeAudioContext() {
     if (this.audioContext?.state === 'suspended') {
       try {
         await this.audioContext.resume();
+        console.log('AudioContext resumed successfully');
       } catch (error) {
-        console.error('Failed to resume audio context:', error);
+        console.error('Failed to resume AudioContext:', error);
+        throw new Error('Failed to resume audio playback');
       }
     }
   }
 
-  async playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
-    if (!this.audioContext || !this.gainNode || this.muted || !this.isInitialized) return;
+  async initializeAudio() {
+    // Set user interaction flag
+    this.hasUserInteraction = true;
+
+    if (this.isInitialized) {
+      await this.resumeAudioContext();
+      return;
+    }
 
     try {
+      // Use standard AudioContext for modern browsers
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+
+      if (!AudioContextClass) {
+        throw new Error('Audio is not supported in this browser');
+      }
+
+      this.audioContext = new AudioContextClass();
+      console.log('AudioContext created successfully');
+
+      this.gainNode = this.audioContext.createGain();
+      this.gainNode.connect(this.audioContext.destination);
+      this.setVolume(0.3);
+
+      // Immediately resume the context if possible
+      await this.resumeAudioContext();
+
+      this.isInitialized = true;
+      console.log('Audio system initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize audio system:', error);
+      // Throw error to be handled by the UI
+      throw new Error(error instanceof Error ? error.message : 'Failed to initialize audio system');
+    }
+  }
+
+  async playTone(frequency: number = 800, duration: number = 0.1, type: OscillatorType = 'sine') {
+    if (!this.hasUserInteraction) {
+      console.log('Waiting for user interaction before playing audio');
+      return;
+    }
+
+    if (!this.audioContext || !this.gainNode || this.muted || !this.isInitialized) {
+      console.log('Cannot play tone:', {
+        hasContext: !!this.audioContext,
+        hasGainNode: !!this.gainNode,
+        isMuted: this.muted,
+        isInitialized: this.isInitialized
+      });
+      return;
+    }
+
+    try {
+      // Try to resume the context before playing
+      await this.resumeAudioContext();
+
       const oscillator = this.audioContext.createOscillator();
       const toneGain = this.audioContext.createGain();
 
@@ -79,8 +121,10 @@ class AudioManager {
 
       oscillator.start();
       oscillator.stop(this.audioContext.currentTime + duration);
+      console.log('Tone played successfully:', { frequency, duration, type });
     } catch (error) {
       console.error('Failed to play tone:', error);
+      throw new Error('Failed to play audio tone');
     }
   }
 

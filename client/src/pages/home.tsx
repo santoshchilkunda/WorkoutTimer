@@ -13,6 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const {
@@ -41,6 +42,7 @@ export default function Home() {
   const [youtubeVolume, setYoutubeVolume] = useState(0.3);
   const [mode, setMode] = useState<"setup" | "workout">("setup");
   const youtubePlayerRef = useRef<YouTubePlayerRef>(null);
+  const { toast } = useToast();
 
   const handleNotificationVolumeChange = (newVolume: number) => {
     setNotificationVolume(newVolume);
@@ -63,8 +65,25 @@ export default function Home() {
   };
 
   const handleStart = async () => {
-    setMode("workout");
-    await start();
+    try {
+      // Initialize audio system first
+      await audioManager.initializeAudio();
+      console.log('Audio initialized before starting workout');
+
+      setMode("workout");
+      await start();
+    } catch (error) {
+      console.error('Error starting workout:', error);
+      // Show error toast
+      toast({
+        variant: "destructive",
+        title: "Audio System Error",
+        description: error instanceof Error ? error.message : "Unable to initialize audio. Timer will work without sound notifications.",
+      });
+      // Continue with workout even if audio fails
+      setMode("workout");
+      await start();
+    }
   };
 
   const handleBack = () => {
