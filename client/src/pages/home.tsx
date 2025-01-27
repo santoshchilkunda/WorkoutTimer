@@ -371,7 +371,7 @@ export default function Home() {
                 variant="outline"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Setup
+                New Workout
               </Button>
             </div>
           </DialogContent>
