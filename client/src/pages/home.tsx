@@ -102,16 +102,6 @@ export default function Home() {
             // Setup mode layout
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                <div className="flex flex-col items-center justify-center">
-                  <CircularTimer
-                    progress={progress}
-                    timeLeft={timeLeft}
-                    phase={currentPhase}
-                    currentRound={currentRound}
-                    totalRounds={currentSet.rounds}
-                  />
-                </div>
-
                 <div className="space-y-6">
                   <Tabs
                     value={currentSetIndex.toString()}
@@ -206,25 +196,25 @@ export default function Home() {
                       </TabsContent>
                     ))}
                   </Tabs>
-                </div>
-              </div>
 
-              <div className="flex justify-center gap-4">
-                <Button
-                  size="lg"
-                  onClick={handleStart}
-                  className="w-32"
-                >
-                  <Play className="mr-2 h-4 w-4" /> Start
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={handleReset}
-                  className="w-32"
-                >
-                  <RotateCcw className="mr-2 h-4 w-4" /> Reset
-                </Button>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      size="lg"
+                      onClick={handleStart}
+                      className="w-32"
+                    >
+                      <Play className="mr-2 h-4 w-4" /> Start
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={handleReset}
+                      className="w-32"
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" /> Reset
+                    </Button>
+                  </div>
+                </div>
               </div>
             </>
           ) : (
