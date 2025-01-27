@@ -362,29 +362,17 @@ export default function Home() {
               <p className="text-lg text-muted-foreground">
                 Great job! You've completed your workout session.
               </p>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => {
-                    setShowCompletionDialog(false);
-                    handleBack(); // Use handleBack instead of handleReset to preserve state
-                  }}
-                  className="flex-1"
-                  variant="outline"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Setup
-                </Button>
-                <Button
-                  onClick={() => {
-                    setShowCompletionDialog(false);
-                    handleReset();
-                  }}
-                  className="flex-1"
-                >
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  New Workout
-                </Button>
-              </div>
+              <Button
+                onClick={() => {
+                  setShowCompletionDialog(false);
+                  handleBack(); // Use handleBack to preserve state
+                }}
+                className="w-full"
+                variant="outline"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Setup
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
